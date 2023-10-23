@@ -11,35 +11,44 @@ export class JsonStorage implements Store {
         const path = '/chats/' + String(peer_id) + String(group_id);
         console.log('DB: get ', path);
 
-        try {
-            const data = await this.db.getData(path);
-            return Promise.resolve(Number(data));
+        return await this.db.getObjectDefault<number | undefined>(path, undefined);
 
-        } catch (e) {
-            console.log('DB get error ', e);
-            return Promise.resolve(undefined);
-        }
+        // try {
+        // const data = await this.db.getData(path);
+        // return Number(data);
+        // 
+        // } catch (e) {
+        // console.log('DB get error ', e);
+        // return undefined;
+        // }
     }
 
     public async setInternalChatId(peer_id: number, group_id: number, chat_id: number): Promise<boolean> {
         const path = '/chats/' + String(peer_id) + String(group_id);
 
-        const check_id = await this.getInternalChatId(peer_id, group_id);
+        let check_id;
+
+        // try {
+            check_id = await this.getInternalChatId(peer_id, group_id);
+        // } catch (e) {
+            // console.log('DB set error ', e);
+            // return false;
+        // }
 
         if (check_id) {
             console.log('DB set ', path, 'exists');
-            return Promise.resolve(false);
+            return false;
         }
 
 
-        try {
+        // try {
             await this.db.push(path, chat_id);
             console.log('DB set ', path, ' success');
-            return Promise.resolve(true);
-        } catch (e) {
-            console.log('DB set error ', e);
-            return Promise.resolve(false);
-        }
+            return true;
+        // } catch (e) {
+            // console.log('DB set error ', e);
+            // return false;
+        // }
     }
 
 }
