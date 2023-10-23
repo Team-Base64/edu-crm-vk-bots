@@ -1,0 +1,19 @@
+{
+  "name": "vk-slave-bots",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build" : "tsc",
+    "start": "tsc && node build/index.js"
+  },
+  "author": "George Illarionov",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.8.7",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "vk-io": "^4.8.3"
+  }
+}
