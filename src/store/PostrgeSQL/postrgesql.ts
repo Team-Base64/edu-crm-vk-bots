@@ -9,10 +9,10 @@ export class PostrgesStore implements Store {
     constructor() {
         this.db = new Client({
             user: "george",
-            // host: "db",
-            host: "localhost",
+            host: "db",
+            // host: "localhost",
             password: "1234567890",
-            port: 8000,
+            port: 5432,
             database: 'vk_bots_db',
         });
 

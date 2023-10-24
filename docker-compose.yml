@@ -1,0 +1,39 @@
+version: "3.5"
+services:
+  db:
+    image: "postgres:12"
+    hostname: db
+    ports:
+      - "8000:5432"
+    volumes:
+      - ./src/store/PostrgeSQL/SQL:/docker-entrypoint-initdb.d/
+      - ./tmp/postgres:/var/postgres_data  #<----- modify
+    environment:
+      POSTGRES_USER: george
+      POSTGRES_DB: vk_bots_db
+      POSTGRES_PASSWORD: 1234567890
+#      PGDATA: /var/postgres_data        #<----- add
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d vk_bots_db -U george"]
+      interval: 5s
+      timeout: 10s
+      retries: 120
+    networks:
+      - my-network
+
+  app:
+    build: .
+    hostname: app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+    # links:
+      # - "db:db"
+    networks:
+      - my-network
+networks:
+  my-network:
+    name: somenetwork
+    driver: bridge
