@@ -1,5 +1,12 @@
 import { VK } from "vk-io";
 import { gracefulStop } from "../helpers/graceful-stop";
+import { Middleware, NextMiddleware } from "middleware-io";
+import { ContextDefaultState, MessageContext } from "vk-io";
+
+interface CommandMiddleware {
+    command: string | RegExp;
+    handler: (context: MessageContext<ContextDefaultState>) => any;
+}
 
 export default class VkBot {
     protected token: string;
@@ -50,7 +57,7 @@ export default class VkBot {
             });
     }
 
-    public async sendMessageToClient(peer_id: number, text : string) {
+    public async sendMessageToClient(peer_id: number, text: string) {
         this.vk.api.messages.send({
             peer_id: peer_id,
             message: text,
@@ -58,4 +65,45 @@ export default class VkBot {
         })
     }
 
+    protected initCommandMiddlewares = (cmdMiddleware: CommandMiddleware[]): void => {
+
+        this.vk.updates.on('message_new',
+            async (context: MessageContext<ContextDefaultState>, next: NextMiddleware) => {
+
+                let check_value: undefined | string = undefined;
+
+                // Проверить payload
+                if (context.hasMessagePayload && context.messagePayload.command) {
+                    check_value = context.messagePayload.command;
+                }
+
+                // Проверить текст
+                if (!check_value && context.text) {
+                    check_value = context.text;
+                }
+
+                if (!check_value) {
+                    return next();
+                }
+
+                for (let mw of cmdMiddleware) {
+                    if (mw.command instanceof RegExp) {
+                        if (mw.command.test(check_value as string)) {
+                            await mw.handler(context);
+                            // return next();
+                            break;
+                        }
+                    } else if (typeof mw.command === 'string') {
+                        if (mw.command === check_value) {
+                            await mw.handler(context);
+                            // return next();
+                            break;
+                        }
+                    }
+                }
+
+                return next();
+            }
+        );
+    }
 }
