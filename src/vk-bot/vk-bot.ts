@@ -1,7 +1,8 @@
 import { VK } from "vk-io";
-import { gracefulStop } from "../helpers/graceful-stop";
-import { Middleware, NextMiddleware } from "middleware-io";
+import {  NextMiddleware } from "middleware-io";
 import { ContextDefaultState, MessageContext } from "vk-io";
+import Store from "../store/store";
+import { gracefulStop } from "../../helpers/graceful-stop";
 
 interface CommandMiddleware {
     command: string | RegExp;
@@ -12,18 +13,35 @@ export default class VkBot {
     protected token: string;
     protected vk: VK;
     protected name: string;
-    constructor(token: string, name: string) {
+    protected db: Store;
+    protected group_id: number;
+
+    constructor(token: string, name: string, db: Store) {
         this.token = token;
         this.name = name;
+        this.db = db;
         this.vk = new VK({
             token: this.token,
         });
-
+        this.group_id = 0;
         gracefulStop(this.stop.bind(this));
+    }
+
+    private async getBotGroupId() {
+        console.log('Getting bot group id');
+        const data = await this.vk.api.groups.getById({});
+        if (!data[0].id) {
+            throw Error('Error while getting bot group id');
+        }
+
+        return data[0].id;
     }
 
     public async start() {
         console.log('Starting bot ', this.name);
+        
+        this.group_id = await this.getBotGroupId();
+
         if (this.vk.updates.isStarted) {
             console.log(`Bot ${this.name} already started`);
             return Promise.resolve();
