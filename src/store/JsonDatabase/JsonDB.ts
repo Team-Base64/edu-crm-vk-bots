@@ -6,6 +6,9 @@ export class JsonStorage implements Store {
     constructor(path: string) {
         this.db = new JsonDB(new Config(path, true, true, '/'));
     }
+    public getFreeSlaveBots(peer_id: number): Promise<number[] | undefined> {
+        throw new Error('Method not implemented.');
+    }
 
     public async getInternalChatId(peer_id: number, group_id: number): Promise<number | undefined> {
         const path = '/chats/' + String(peer_id) + String(group_id);
