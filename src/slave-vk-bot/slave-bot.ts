@@ -4,11 +4,9 @@ import Store from "../store/store";
 
 
 export default class VkSlaveBot extends VkBot {
-    db: Store;
     constructor(token: string, name: string, db: Store) {
-        super(token, 'Slave ' + name);
+        super(token, 'Slave ' + name, db);
         this.initMiddlewares();
-        this.db = db;
     }
 
     private initMiddlewares(): void {
