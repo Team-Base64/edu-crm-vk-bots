@@ -1,6 +1,7 @@
 import { ContextDefaultState, MessageContext } from "vk-io";
 import VkBot from "../vk-bot/vk-bot"
 import Store from "../store/store";
+import backend from "../../mock/backend";
 
 
 export default class VkSlaveBot extends VkBot {
@@ -29,7 +30,7 @@ export default class VkSlaveBot extends VkBot {
 
     private async handleMessage(context: MessageContext<ContextDefaultState>): Promise<boolean> {
 
-        const { peerId, $groupId } = context;
+        const { peerId, $groupId, text } = context;
 
         if (!$groupId) {
             console.log('Group id is undefined');
@@ -39,9 +40,9 @@ export default class VkSlaveBot extends VkBot {
         // Проверить что GroupId + sender_id есть в базе
         // Получить из базы chat_id 
 
-        const inernal_chat_id = await this.db.getInternalChatId(peerId, $groupId);
+        const internal_chat_id = await this.db.getInternalChatId(peerId, $groupId);
 
-        if (!inernal_chat_id) {
+        if (!internal_chat_id) {
             // this.sendMessageToClient(peerId, )
             await context.send("С этим ботом не связан ваш преподаватель", { peer_id: peerId });
             console.log(`Пользователь ${peerId} не связан с ${$groupId}`);
@@ -55,6 +56,11 @@ export default class VkSlaveBot extends VkBot {
 
         // Отправить сообщение по grpc
 
+        const isOk = await backend.resendMessageFromClient(internal_chat_id, text || '' );
+
+        if(!isOk){
+            this.sendMessageToClient(peerId, 'Сообщение не доставлено');
+        }
 
         // VK API
 
@@ -70,11 +76,11 @@ export default class VkSlaveBot extends VkBot {
         // peer_id:  vk_id получателя
         // message: - текстовое сообщение
         // group_id: - id группы вк где бот - не обязательно!!!
-        console.log("new message:");
-        console.log('\tChatId: ', context.chatId);
-        console.log('\tGroupId: ', context.$groupId);
-        console.log('\tUserId: ', context.senderId);
-        console.log('\tText: ', context.text);
+        // console.log("new message:");
+        // console.log('\tInternalChatId: ', inernal_chat_id);
+        // console.log('\tGroupId: ', context.$groupId);
+        // console.log('\tUserId: ', context.senderId);
+        // console.log('\tText: ', context.text);
 
         return true;
     }

@@ -53,7 +53,11 @@ export class PostrgesStore implements Store {
                                 and vk_user_id = $2;`,
             [group_id, peer_id])
             .then(data => {
-                const internal_chat_id: number | undefined = data.rows[0];
+                console.log(data.rows);
+                if(!data.rows[0].internal_chat_id){
+                    return undefined;
+                }
+                const internal_chat_id = data.rows[0].internal_chat_id;
                 return internal_chat_id;
             })
             .catch(e => {

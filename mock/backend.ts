@@ -110,6 +110,15 @@ class Backend {
         return chat_id;
     }
 
+    public async resendMessageFromClient(internal_chat_id :number, text : string) : Promise<boolean>{
+        console.log('GRPC -> Send to backend', {chat_id: internal_chat_id, text: text});
+        return true;
+    }
+
+    public resendMessageFromServer(internal_chat_id : number, text : string) {
+        
+    }
+
 }
 
 export default new Backend();
