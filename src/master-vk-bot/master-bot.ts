@@ -6,14 +6,22 @@ import { CommandPatterns } from "./Commands/command-patterns";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
 import { AcceptTokenScene } from "./Scenes/accept-token-scene";
 import { customSceneMiddleware } from "./Scenes/custom-scene-middleware";
+import Store from "../store/store";
+import backend from "../../mock/backend";
+import { randomInt } from "crypto";
+
+export interface InviteData {
+    invite_token: string,
+    peer_id: number,
+}
 
 export class VkMasterBot extends VkBot {
 
     sessionManager: SessionManager;
     sceneManager: SceneManager;
 
-    constructor(token: string, name: string) {
-        super(token, 'Master ' + name);
+    constructor(token: string, name: string, db: Store) {
+        super(token, 'Master ' + name, db);
 
         this.sessionManager = new SessionManager();
         this.sceneManager = new SceneManager();
@@ -57,10 +65,75 @@ export class VkMasterBot extends VkBot {
 
     private initSceneManager() {
         this.sceneManager.addScenes([
-            AcceptTokenScene.scene
+            AcceptTokenScene.scene(this.handleInvite.bind(this))
         ]);
     }
 
+    private async handleInvite(data: InviteData) {
+        // Проверить токен на валидность на бэке 
 
 
+        const { invite_token, peer_id } = data;
+
+        console.log('Handle token ', data.invite_token);
+
+        const expires = await backend.validateInviteToken(invite_token);
+
+
+        console.log('Token validation result ', expires);
+        // Если не ок, получить undefined
+        if (!expires) {
+            console.log('Не нашли токен ', invite_token);
+            this.sendMessageToClient(peer_id, 'Не нашли токен для приглашения ' + invite_token);
+            return;
+        }
+
+        // Если ок, 
+
+        // Посмтреть есть ли свободные боты 
+        const free_bot_groups_ids = await this.db.getFreeSlaveBots(peer_id);
+
+        // Ошибка при получении
+        if (!free_bot_groups_ids) {
+            this.sendMessageToClient(peer_id, 'Повторите запрос позже');
+            return;
+        }
+
+        // Нет свободных ботов
+        if(free_bot_groups_ids.length < 1) {
+            this.sendMessageToClient(peer_id, 'Все боты заняты :с');
+            return;
+        }
+
+
+        // получить internal_chat_id
+        const internal_chat_id = await  backend.createChat();
+
+        if(!internal_chat_id){
+            this.sendMessageToClient(peer_id, 'Что-то пошло не так');
+            return;
+        }
+
+        // выбрать бота
+        const len = free_bot_groups_ids.length;
+        const index = len > 1 ? randomInt(0, len - 1) : 0;
+        const group_id = free_bot_groups_ids[index];
+
+        // Привязать бота к новому чату 
+
+        const isOk = await this.db.setInternalChatId(peer_id, group_id, internal_chat_id );
+
+        if(!isOk){
+            this.sendMessageToClient(peer_id, 'Ошибка :с');
+            return;
+        }
+
+        console.log('Супер! бот привязан к пользователю');
+
+        this.sendMessageToClient(peer_id, `Токен принят!\n\n
+        Для связи с преподавателем используйте:\n
+        https://vk.com/im?sel=-${group_id}`)
+    
+        return;
+    }
 }
