@@ -28,6 +28,11 @@ export default class GRPCBackend extends BotChatClient implements Backend {
                 this.handleMessageFromServer(internal_chat_id, text);
             }
         });
+
+        this.stream.on('end', () => {
+            console.log('connection down\nNeed restart');
+            process.exit(0);
+        });
     }
 
     public addHandle(handler: HMFS) {
@@ -52,7 +57,7 @@ export default class GRPCBackend extends BotChatClient implements Backend {
         const msg = new Message();
         msg.setChatid(internal_chat_id);
         msg.setText(text);
-        console.log('GRPC');
+        console.log('GRPC sending ', msg);
         return new Promise(() => {
 
             this.stream.write(msg, (e: any) => {
