@@ -82,7 +82,7 @@ export default class VkSlaveBot extends VkBot {
         // message: - текстовое сообщение
         // group_id: - id группы вк где бот - не обязательно!!!
         // console.log("new message:");
-        // console.log('\tInternalChatId: ', inernal_chat_id);
+        // console.log('\tInternalChatId: ', internal_chat_id);
         // console.log('\tGroupId: ', context.$groupId);
         // console.log('\tUserId: ', context.senderId);
         // console.log('\tText: ', context.text);
