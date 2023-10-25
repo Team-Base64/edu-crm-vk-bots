@@ -3,6 +3,7 @@ import {  NextMiddleware } from "middleware-io";
 import { ContextDefaultState, MessageContext } from "vk-io";
 import Store from "../store/store";
 import { gracefulStop } from "../../helpers/graceful-stop";
+import Backend from "../backend/backend";
 
 interface CommandMiddleware {
     command: string | RegExp;
@@ -10,16 +11,19 @@ interface CommandMiddleware {
 }
 
 export default class VkBot {
-    protected token: string;
+    public readonly token: string;
+    public readonly name: string;
+
     protected vk: VK;
-    protected name: string;
     protected db: Store;
+    protected backend : Backend;
     protected group_id: number;
 
-    constructor(token: string, name: string, db: Store) {
+    constructor(token: string, name: string, db: Store, backend: Backend) {
         this.token = token;
         this.name = name;
         this.db = db;
+        this.backend = backend;
         this.vk = new VK({
             token: this.token,
         });
@@ -27,7 +31,7 @@ export default class VkBot {
         gracefulStop(this.stop.bind(this));
     }
 
-    private async getBotGroupId() {
+    public async getBotGroupId() {
         console.log('Getting bot group id');
         const data = await this.vk.api.groups.getById({});
         if (!data[0].id) {

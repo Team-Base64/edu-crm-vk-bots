@@ -1,12 +1,12 @@
-import { ContextDefaultState, MessageContext } from "vk-io";
 import VkBot from "../vk-bot/vk-bot"
 import Store from "../store/store";
-import backend from "../../mock/backend";
+import Backend from "../backend/backend";
 
+import { ContextDefaultState, MessageContext } from "vk-io";
 
 export default class VkSlaveBot extends VkBot {
-    constructor(token: string, name: string, db: Store) {
-        super(token, 'Slave ' + name, db);
+    constructor(token: string, name: string, db: Store, backend : Backend) {
+        super(token, 'Slave ' + name, db, backend);
         this.initMiddlewares();
     }
 
@@ -56,7 +56,7 @@ export default class VkSlaveBot extends VkBot {
 
         // Отправить сообщение по grpc
 
-        const isOk = await backend.resendMessageFromClient(internal_chat_id, text || '' );
+        const isOk = await this.backend.resendMessageFromClient(internal_chat_id, text || '' );
 
         if(!isOk){
             this.sendMessageToClient(peerId, 'Сообщение не доставлено');

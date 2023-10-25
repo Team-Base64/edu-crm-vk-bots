@@ -1,13 +1,13 @@
 import VkBot from "../vk-bot/vk-bot";
+import Store from "../store/store";
+import Backend from "../backend/backend";
+
 import { SessionManager } from '@vk-io/session';
 import { SceneManager } from '@vk-io/scenes';
-
 import { CommandPatterns } from "./Commands/command-patterns";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
 import { AcceptTokenScene } from "./Scenes/accept-token-scene";
 import { customSceneMiddleware } from "./Scenes/custom-scene-middleware";
-import Store from "../store/store";
-import backend from "../../mock/backend";
 import { randomInt } from "crypto";
 
 export interface InviteData {
@@ -20,8 +20,8 @@ export class VkMasterBot extends VkBot {
     sessionManager: SessionManager;
     sceneManager: SceneManager;
 
-    constructor(token: string, name: string, db: Store) {
-        super(token, 'Master ' + name, db);
+    constructor(token: string, name: string, db: Store, backend: Backend) {
+        super(token, 'Master ' + name, db, backend);
 
         this.sessionManager = new SessionManager();
         this.sceneManager = new SceneManager();
@@ -77,7 +77,7 @@ export class VkMasterBot extends VkBot {
 
         console.log('Handle token ', data.invite_token);
 
-        const expires = await backend.validateInviteToken(invite_token);
+        const expires = await this.backend.validateInviteToken(invite_token);
 
 
         console.log('Token validation result ', expires);
@@ -100,16 +100,16 @@ export class VkMasterBot extends VkBot {
         }
 
         // Нет свободных ботов
-        if(free_bot_groups_ids.length < 1) {
+        if (free_bot_groups_ids.length < 1) {
             this.sendMessageToClient(peer_id, 'Все боты заняты :с');
             return;
         }
 
 
         // получить internal_chat_id
-        const internal_chat_id = await  backend.createChat();
+        const internal_chat_id = await this.backend.createChat();
 
-        if(!internal_chat_id){
+        if (!internal_chat_id) {
             this.sendMessageToClient(peer_id, 'Что-то пошло не так');
             return;
         }
@@ -121,9 +121,9 @@ export class VkMasterBot extends VkBot {
 
         // Привязать бота к новому чату 
 
-        const isOk = await this.db.setInternalChatId(peer_id, group_id, internal_chat_id );
+        const isOk = await this.db.setInternalChatId(peer_id, group_id, internal_chat_id);
 
-        if(!isOk){
+        if (!isOk) {
             this.sendMessageToClient(peer_id, 'Ошибка :с');
             return;
         }
@@ -133,7 +133,7 @@ export class VkMasterBot extends VkBot {
         this.sendMessageToClient(peer_id, `Токен принят!\n\n
         Для связи с преподавателем используйте:\n
         https://vk.com/im?sel=-${group_id}`)
-    
+
         return;
     }
 }
