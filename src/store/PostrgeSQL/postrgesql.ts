@@ -140,7 +140,7 @@ export class PostrgesStore implements Store {
     }
 
     public getTargetViaInternalChatId(internal_chat_id: number): Promise<VkBotLink | undefined> {
-        return this.db.query(`select vk_group_id, peer_id, inernal_chat_id 
+        return this.db.query(`select vk_group_id, vk_user_id, inernal_chat_id 
         from link_user_bot_chat
          where internal_chat_id = $1;`,
             [internal_chat_id])
@@ -151,7 +151,7 @@ export class PostrgesStore implements Store {
                 }
                 const row = data.rows[0];
                 const res: VkBotLink = {
-                    peer_id: row.peer_id,
+                    peer_id: row.vk_user_id,
                     vk_group_id: row.vk_group_id,
                     internal_chat_id: row.inernal_chat_id
                 }
