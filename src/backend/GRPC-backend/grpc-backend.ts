@@ -61,7 +61,7 @@ export default class GRPCBackend extends BotChatClient implements Backend {
         return new Promise(() => {
 
             this.stream.write(msg, (e: any) => {
-                console.log('\tgrpc done. error: ', e);
+                console.log(`\tgrpc done. [${text}}]. Error is `, e);
                 if (!e) {
                     return true;
                 }
