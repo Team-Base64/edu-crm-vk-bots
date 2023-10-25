@@ -28,7 +28,7 @@ class VkBotsManager {
     }
 
     public async init(): Promise<any> {
-        this.backend.addHandle(this.sendToSlave);
+        this.backend.addHandle(this.sendToSlave.bind(this));
         return Promise.all([
             this.initSlaves(),
             this.initMaster()
