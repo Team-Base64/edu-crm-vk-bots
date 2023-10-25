@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node build/src/index.js",
-    "grpc": "sh src/backend/GRPC-backend/grpc/build.sh",
+    "start": "ts-node src/index.ts",
     "protogen": "sh build.sh"
   },
   "author": "George Illarionov",

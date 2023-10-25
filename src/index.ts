@@ -9,7 +9,7 @@ import Store from "./store/store";
 import { token, token2, token3 } from "./tokens";
 import VkBot from "./vk-bot/vk-bot";
 
-import grpc from '@grpc/grpc-js';
+const grpc = require('@grpc/grpc-js');
 
 
 class VkBotsManager {
