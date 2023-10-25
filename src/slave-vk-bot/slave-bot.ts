@@ -30,6 +30,8 @@ export default class VkSlaveBot extends VkBot {
 
     private async handleMessage(context: MessageContext<ContextDefaultState>): Promise<boolean> {
 
+
+        console.log('Slage get message');
         const { peerId, $groupId, text } = context;
 
         if (!$groupId) {
@@ -41,6 +43,7 @@ export default class VkSlaveBot extends VkBot {
         // Получить из базы chat_id 
 
         const internal_chat_id = await this.db.getInternalChatId(peerId, $groupId);
+        console.log('\t Found chat', internal_chat_id);
 
         if (!internal_chat_id) {
             // this.sendMessageToClient(peerId, )
@@ -55,12 +58,14 @@ export default class VkSlaveBot extends VkBot {
         // Собрать сообщение
 
         // Отправить сообщение по grpc
-
+        console.log('\tОтправляем');
         const isOk = await this.backend.resendMessageFromClient(internal_chat_id, text || '' );
 
         if(!isOk){
             this.sendMessageToClient(peerId, 'Сообщение не доставлено');
         }
+        console.log('\tОтправили');
+
 
         // VK API
 
