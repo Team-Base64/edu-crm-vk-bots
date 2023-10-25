@@ -1,4 +1,4 @@
-import Backend, {HMFS} from "../backend";
+import Backend, { HMFS } from "../backend";
 import { BotChatClient } from "./grpc/proto/model_grpc_pb";
 import grpc from '@grpc/grpc-js';
 import { Message } from "./grpc/proto/model_pb";
@@ -30,9 +30,9 @@ export default class GRPCBackend extends BotChatClient implements Backend {
         });
     }
 
-    public addHandle(handler : HMFS) {
+    public addHandle(handler: HMFS) {
         this.handleMessageFromServer = handler;
-    } 
+    }
 
     public validateInviteToken(token: string): Promise<number | undefined> {
 
@@ -45,7 +45,7 @@ export default class GRPCBackend extends BotChatClient implements Backend {
     }
 
     public createChat(): Promise<number | undefined> {
-        throw new Error("Method not implemented.");
+        return Promise.resolve(2);
     }
 
     public resendMessageFromClient(internal_chat_id: number, text: string): Promise<boolean> {
