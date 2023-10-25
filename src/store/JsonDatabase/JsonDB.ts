@@ -1,10 +1,19 @@
 import { JsonDB, Config } from 'node-json-db';
-import Store from '../store';
+import Store, { VkBotData, VkBotLink } from '../store';
 
 export class JsonStorage implements Store {
     db: JsonDB;
     constructor(path: string) {
         this.db = new JsonDB(new Config(path, true, true, '/'));
+    }
+    public getSlaveBots(): Promise<VkBotData[] | undefined> {
+        throw new Error('Method not implemented.');
+    }
+    public getMasterBots(): Promise<VkBotData[] | undefined> {
+        throw new Error('Method not implemented.');
+    }
+    public getTargetViaInternalChatId(internal_chat_id: number): Promise<VkBotLink | undefined> {
+        throw new Error('Method not implemented.');
     }
     public getFreeSlaveBots(peer_id: number): Promise<number[] | undefined> {
         throw new Error('Method not implemented.');

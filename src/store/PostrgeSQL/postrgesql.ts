@@ -1,5 +1,5 @@
 import { gracefulStop } from "../../../helpers/graceful-stop";
-import Store from "../store";
+import Store, { VkBotData, VkBotLink } from "../store";
 import { Client } from "pg";
 
 export class PostrgesStore implements Store {
@@ -9,10 +9,11 @@ export class PostrgesStore implements Store {
     constructor() {
         this.db = new Client({
             user: "george",
-            host: "db",
-            // host: "localhost",
+            // host: "db",
+            host: "localhost",
             password: "1234567890",
-            port: 5432,
+            // port: 5432,
+            port: 8000,
             database: 'vk_bots_db',
         });
 
@@ -54,7 +55,7 @@ export class PostrgesStore implements Store {
             [group_id, peer_id])
             .then(data => {
                 console.log(data.rows);
-                if(!data.rows[0].internal_chat_id){
+                if (!data.rows[0].internal_chat_id) {
                     return undefined;
                 }
                 const internal_chat_id = data.rows[0].internal_chat_id;
@@ -92,7 +93,7 @@ export class PostrgesStore implements Store {
                                                         WHERE vk_bots.vk_group_id = link_user_bot_chat.vk_group_id
                                                           AND vk_user_id = $1)
                                 AND bot_type = 'S';`,
-         [peer_id])
+            [peer_id])
             .then(data => {
                 console.log(data.rows);
                 const group_ids = data.rows.map(item => {
@@ -105,5 +106,60 @@ export class PostrgesStore implements Store {
                 return undefined;
             });
 
+    }
+
+    private async getBots(role: 'M' | 'S'): Promise<VkBotData[] | undefined> {
+        return this.db.query(`select token, vk_group_id, bot_type 
+        from vk_bots 
+        where bot_type = $1;`,
+            [role])
+            .then(data => {
+                if (!data.rows) {
+                    return undefined
+                }
+                return data.rows.map((row): VkBotData => {
+                    return {
+                        token: row.token,
+                        role: row.bot_type,
+                        vk_group_id: row.vk_group_id,
+                    };
+                })
+            })
+            .catch(e => {
+                console.log('Postrges get vk bots ', e);
+                return undefined;
+            });
+    }
+
+    public async getSlaveBots(): Promise<VkBotData[] | undefined> {
+        return this.getBots('S');
+    }
+
+    public async getMasterBots(): Promise<VkBotData[] | undefined> {
+        return this.getBots('M');
+    }
+
+    public getTargetViaInternalChatId(internal_chat_id: number): Promise<VkBotLink | undefined> {
+        return this.db.query(`select vk_group_id, peer_id, inernal_chat_id 
+        from link_user_bot_chat
+         where internal_chat_id = $1;`,
+            [internal_chat_id])
+
+            .then(data => {
+                if (!data.rows.length) {
+                    return undefined;
+                }
+                const row = data.rows[0];
+                const res: VkBotLink = {
+                    peer_id: row.peer_id,
+                    vk_group_id: row.vk_group_id,
+                    internal_chat_id: row.inernal_chat_id
+                }
+                return res;
+            })
+            .catch(e => {
+                console.log('Postrges get bot data via chat id ',e );
+                return undefined;
+            });
     }
 }
