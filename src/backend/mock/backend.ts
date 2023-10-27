@@ -1,9 +1,10 @@
-import {Client} from "pg";
+import { Client } from "pg";
 import { gracefulStop } from "../../../helpers/graceful-stop";
-import Backend, { HMFS } from "../backend";
+import Backend, { ServerMessageToSlaveHandler } from "../backend";
 
 class BackendMock implements Backend {
     db: Client;
+    toSlaveHandler: ServerMessageToSlaveHandler[];
 
     constructor() {
         this.db = new Client({
@@ -15,13 +16,10 @@ class BackendMock implements Backend {
             port: 8000,
             database: 'vk_bots_db',
         });
-
+        this.toSlaveHandler = [];
         gracefulStop(async () => {
             await this.stop.bind(this);
         });
-    }
-    public addHandle(handler: HMFS): void {
-        throw new Error("Method not implemented.");
     }
 
     public async start() {
@@ -62,7 +60,7 @@ class BackendMock implements Backend {
                     return undefined;
                 }
                 const expires = Number(data.rows[0].expires);
-                return  expires;
+                return expires;
             })
             .catch(e => {
                 console.log('Backend Mock get token error ', e);
@@ -71,7 +69,7 @@ class BackendMock implements Backend {
     }
 
     public async db_createChat(): Promise<number | undefined> {
-      console.log('Backend: cheate chat');
+        console.log('Backend: cheate chat');
 
         return this.db.query(`insert into internal_chats(slug)
                               values ($1)
@@ -91,7 +89,7 @@ class BackendMock implements Backend {
     }
 
     public async validateInviteToken(token: string): Promise<number | undefined> {
-      console.log('Backend validate token');
+        console.log('Backend validate token');
         // Смотрим токен в бд
         const expires = await this.db_getToken(token);
 
@@ -103,11 +101,9 @@ class BackendMock implements Backend {
         }
 
         return expires;
-
-        
     }
 
-    public async createChat () : Promise<number | undefined> {
+    public async createChat(): Promise<number | undefined> {
         // Если нашли
         // Создаём чат
         const chat_id = await this.db_createChat();
@@ -115,15 +111,18 @@ class BackendMock implements Backend {
         return chat_id;
     }
 
-    public async resendMessageFromClient(internal_chat_id :number, text : string) : Promise<boolean>{
-        console.log('GRPC -> Send to backend', {chat_id: internal_chat_id, text: text});
-        return true;
+
+    public resendMessageFromClient(internal_chat_id: number, text: string): Promise<boolean> {
+        console.log('MOCK-GRPC. Sending msg to sever ', text);
+        return Promise.resolve(true);
     }
 
-    public resendMessageFromServer(internal_chat_id : number, text : string) : Promise<any> {
-        return Promise.resolve();
+    public resendFromServerToSlave(internal_chat_id: number, text: string): void {
+        throw new Error("Method not implemented.");
     }
-
+    public addHandleMessageFromServerToSlave(handler: ServerMessageToSlaveHandler): void {
+        this.toSlaveHandler.push(handler);
+    }
 }
 
 export default BackendMock;

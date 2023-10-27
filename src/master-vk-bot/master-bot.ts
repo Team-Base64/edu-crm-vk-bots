@@ -93,7 +93,7 @@ export class VkMasterBot extends VkBot {
         // Посмтреть есть ли свободные боты 
         const free_bot_groups_ids = await this.db.getFreeSlaveBots(peer_id);
 
-        // Ошибка при получении
+        // Ошибка при получении ботов
         if (!free_bot_groups_ids) {
             this.sendMessageToClient(peer_id, 'Повторите запрос позже');
             return;
@@ -105,8 +105,7 @@ export class VkMasterBot extends VkBot {
             return;
         }
 
-
-        // получить internal_chat_id
+        // получить internal_chat_id (создать чат на бэке)
         const internal_chat_id = await this.backend.createChat();
 
         if (!internal_chat_id) {
@@ -115,12 +114,12 @@ export class VkMasterBot extends VkBot {
         }
 
         // выбрать бота
+        // *тут умный алгоритм*
         const len = free_bot_groups_ids.length;
         const index = len > 1 ? randomInt(0, len - 1) : 0;
         const group_id = free_bot_groups_ids[index];
 
         // Привязать бота к новому чату 
-
         const isOk = await this.db.setInternalChatId(peer_id, group_id, internal_chat_id);
 
         if (!isOk) {

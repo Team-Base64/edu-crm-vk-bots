@@ -1,4 +1,4 @@
-import Backend, { HMFS } from "../backend";
+import Backend, { ServerMessageToSlaveHandler } from "../backend";
 import { BotChatClient } from "./grpc/proto/model_grpc_pb";
 import grpc from '@grpc/grpc-js';
 import { Message } from "./grpc/proto/model_pb";
@@ -13,30 +13,25 @@ interface grpcOptions {
 export default class GRPCBackend extends BotChatClient implements Backend {
 
     stream;
-    handleMessageFromServer: HMFS | undefined;
+    toSlaveHandlers: ServerMessageToSlaveHandler[];
+
     constructor(grpc: grpcOptions) {
         const { address, credentials, options } = grpc
         super(address, credentials, options);
 
         this.stream = this.startChatVK();
-        this.handleMessageFromServer = undefined;
+        this.toSlaveHandlers = [];
 
         this.stream.on('data', (data) => {
-            const text = data.array[0];
-            const internal_chat_id = data.array[1];
-            if (this.handleMessageFromServer) {
-                this.handleMessageFromServer(internal_chat_id, text);
-            }
+            const text = data.array[0] as string;
+            const internal_chat_id = data.array[1] as number;
+            this.resendFromServerToSlave(internal_chat_id, text);
         });
 
         this.stream.on('end', () => {
             console.log('connection down\nNeed restart');
             process.exit(0);
         });
-    }
-
-    public addHandle(handler: HMFS) {
-        this.handleMessageFromServer = handler;
     }
 
     public validateInviteToken(token: string): Promise<number | undefined> {
@@ -50,6 +45,7 @@ export default class GRPCBackend extends BotChatClient implements Backend {
     }
 
     public createChat(): Promise<number | undefined> {
+        // TODO!!!
         return Promise.resolve(2);
     }
 
@@ -57,9 +53,9 @@ export default class GRPCBackend extends BotChatClient implements Backend {
         const msg = new Message();
         msg.setChatid(internal_chat_id);
         msg.setText(text);
+
         console.log('GRPC sending ', text);
         return new Promise(() => {
-
             this.stream.write(msg, (e: any) => {
                 console.log(`\tgrpc done. [${text}}]. Error is `, e);
                 if (!e) {
@@ -70,7 +66,11 @@ export default class GRPCBackend extends BotChatClient implements Backend {
         })
     }
 
-    public resendMessageFromServer(internal_chat_id: number, text: string): Promise<any> {
-        throw new Error("Method not implemented.");
+    public resendFromServerToSlave(internal_chat_id: number, text: string): void {
+        this.toSlaveHandlers.forEach(h => h(internal_chat_id, text));
+    }
+
+    public addHandleMessageFromServerToSlave(handler: ServerMessageToSlaveHandler): void {
+       this.toSlaveHandlers.push(handler);
     }
 }

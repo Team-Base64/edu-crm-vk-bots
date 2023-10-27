@@ -11,14 +11,6 @@ export default class VkSlaveBot extends VkBot {
     }
 
     private initMiddlewares(): void {
-        // this.vk.updates.use(async (context, next) => {
-        //     try {
-        //         await next();
-        //     } catch (e) {
-        //         console.error(e);
-        //     }
-        // });
-
         this.vk.updates.on('message_new', async (context, next) => {
             if (!await this.handleMessage(context)) {
                 return;
@@ -29,8 +21,6 @@ export default class VkSlaveBot extends VkBot {
     }
 
     private async handleMessage(context: MessageContext<ContextDefaultState>): Promise<boolean> {
-
-
         console.log('Slage get message');
         const { peerId, $groupId, text } = context;
 
@@ -39,25 +29,20 @@ export default class VkSlaveBot extends VkBot {
             return false;
         }
 
-        // Проверить что GroupId + sender_id есть в базе
+        // Проверить что пользователь привязан к боту и чату в crm 
         // Получить из базы chat_id 
-
         const internal_chat_id = await this.db.getInternalChatId(peerId, $groupId);
         console.log('\t Found chat', internal_chat_id);
 
         if (!internal_chat_id) {
-            // this.sendMessageToClient(peerId, )
             await context.send("С этим ботом не связан ваш преподаватель", { peer_id: peerId });
             console.log(`Пользователь ${peerId} не связан с ${$groupId}`);
 
             return false;
         }
 
-
-
         // Собрать сообщение
-
-        // Отправить сообщение по grpc
+        // Отправить сообщение на бэкэнд
         console.log('\tОтправляем');
         const isOk = await this.backend.resendMessageFromClient(internal_chat_id, text || '' );
 
@@ -65,38 +50,12 @@ export default class VkSlaveBot extends VkBot {
             this.sendMessageToClient(peerId, 'Сообщение не доставлено');
         }
         console.log('\tОтправили');
-
-
-        // VK API
-
-        // Receiving 
-
-        // ChatId - групповые беседы
-        // senderId - id автора сообщения
-        // GroupId - id группы в вк
-
-
         // Sending
         // random_id: - рандомное число, Date.now() + smth
         // peer_id:  vk_id получателя
         // message: - текстовое сообщение
         // group_id: - id группы вк где бот - не обязательно!!!
-        // console.log("new message:");
-        // console.log('\tInternalChatId: ', internal_chat_id);
-        // console.log('\tGroupId: ', context.$groupId);
-        // console.log('\tUserId: ', context.senderId);
-        // console.log('\tText: ', context.text);
 
         return true;
     }
-
-    // public sendMsg(text: string) {
-    //     this.vk.api.messages.send({
-    //         random_id: Date.now(),
-    //         peer_id: 211427710,
-    //         message: "Hello!!!!!",
-    //         // group_id: 222973424,
-    //     });
-    // }
-
 }
