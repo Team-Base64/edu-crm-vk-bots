@@ -1,21 +1,13 @@
-import { Client } from "pg";
-import { gracefulStop } from "../../../helpers/graceful-stop";
+import {Client, ClientConfig} from "pg";
+import { gracefulStop } from "../../helpers/graceful-stop";
 import Backend, { ServerMessageToSlaveHandler } from "../backend";
 
 class BackendMock implements Backend {
     db: Client;
     toSlaveHandler: ServerMessageToSlaveHandler[];
 
-    constructor() {
-        this.db = new Client({
-            user: "george",
-            // host: "db",
-            host: "localhost",
-            password: "1234567890",
-            // port: 5432,
-            port: 8000,
-            database: 'vk_bots_db',
-        });
+    constructor(db_config : ClientConfig) {
+        this.db = new Client(db_config);
         this.toSlaveHandler = [];
         gracefulStop(async () => {
             await this.stop.bind(this);

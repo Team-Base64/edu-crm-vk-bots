@@ -1,14 +1,7 @@
 import Backend, { ServerMessageToSlaveHandler } from "../backend";
 import { BotChatClient } from "./grpc/proto/model_grpc_pb";
-import grpc from '@grpc/grpc-js';
 import { Message } from "./grpc/proto/model_pb";
-
-interface grpcOptions {
-    address: string;
-    credentials: grpc.ChannelCredentials;
-    options?: any;
-}
-
+import grpcOptions from "./config";
 
 export default class GRPCBackend extends BotChatClient implements Backend {
 

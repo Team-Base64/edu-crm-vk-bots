@@ -2,7 +2,7 @@ import { VK } from "vk-io";
 import {  NextMiddleware } from "middleware-io";
 import { ContextDefaultState, MessageContext } from "vk-io";
 import Store from "../store/store";
-import { gracefulStop } from "../../helpers/graceful-stop";
+import { gracefulStop } from "../helpers/graceful-stop";
 import Backend from "../backend/backend";
 
 interface CommandMiddleware {
@@ -43,7 +43,7 @@ export default class VkBot {
 
     public async start() {
         console.log('Starting bot ', this.name);
-        
+
         this.group_id = await this.getBotGroupId();
 
         if (this.vk.updates.isStarted) {

@@ -6,8 +6,8 @@ services:
     ports:
       - "8000:5432"
     volumes:
-      - ./src/store/PostrgeSQL/SQL:/docker-entrypoint-initdb.d/
-      - ./tmp/postgres:/var/postgres_data  #<----- modify
+      - ./db:/docker-entrypoint-initdb.d/
+#      - ./tmp/postgres-data:/var/postgres_data  #<----- modify
     environment:
       POSTGRES_USER: george
       POSTGRES_DB: vk_bots_db
@@ -22,15 +22,13 @@ services:
       - my-network
 
   app:
-    build: .
+    build: ./app
     hostname: app
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "8001:8001"
-    # links:
-      # - "db:db"
     networks:
       - my-network
 networks:

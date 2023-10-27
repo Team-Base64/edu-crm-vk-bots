@@ -1,21 +1,13 @@
-import { gracefulStop } from "../../../helpers/graceful-stop";
+import { gracefulStop } from "../../helpers/graceful-stop";
 import Store, { VkBotData, VkBotLink } from "../store";
-import { Client } from "pg";
+import {Client, ClientConfig} from "pg";
 
 export class PostrgesStore implements Store {
 
     db: Client;
 
-    constructor() {
-        this.db = new Client({
-            user: "george",
-            // host: "db",
-            host: "localhost",
-            password: "1234567890",
-            // port: 5432,
-            port: 8000,
-            database: 'vk_bots_db',
-        });
+    constructor(config : ClientConfig) {
+        this.db = new Client(config);
 
         gracefulStop(async () => {
             await this.stop.bind(this);

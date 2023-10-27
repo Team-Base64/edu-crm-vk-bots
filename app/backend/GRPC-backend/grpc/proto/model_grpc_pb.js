@@ -5,7 +5,7 @@
 // --grpc_out=grpc_js:. proto/model.proto
 'use strict';
 var grpc = require('@grpc/grpc-js');
-var src_backend_GRPC$backend_grpc_proto_model_pb = require('../../../../../src/backend/GRPC-backend/grpc/proto/model_pb.js');
+var src_backend_GRPC$backend_grpc_proto_model_pb = require('./model_pb.js');
 
 function serialize_chat_Message(arg) {
   if (!(arg instanceof src_backend_GRPC$backend_grpc_proto_model_pb.Message)) {
