@@ -7,12 +7,12 @@ services:
       - "8000:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
-#      - ./tmp/postgres-data:/var/postgres_data  #<----- modify
+#      - ./tmp/postgres-data:/var/postgres_data  # Это для того чтобы после перезапуска докера база сохранялась
     environment:
       POSTGRES_USER: george
       POSTGRES_DB: vk_bots_db
       POSTGRES_PASSWORD: 1234567890
-#      PGDATA: /var/postgres_data        #<----- add
+#      PGDATA: /var/postgres_data        # Это для того чтобы после перезапуска докера база сохранялась
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d vk_bots_db -U george"]
       interval: 5s
