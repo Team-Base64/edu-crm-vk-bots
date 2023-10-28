@@ -14,8 +14,4 @@ RUN npm ci
 
 EXPOSE 8001
 
-RUN mkdir -p $LOGDIR
-
 CMD npm start
-
-

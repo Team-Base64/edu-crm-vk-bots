@@ -22,8 +22,15 @@ services:
       - my-network
 
   app:
-    build: ./app
+    build:
+      context: ./app
+      args:
+        LOGDIR: /var/app/logs  # Куда в контейнере писать логи. Закомментить чтобы писалось в консоль контейнера
+        LOGLEVEL: 'debug'  # Уровень логов
+        DOCKER: true # Флагдля докера
     hostname: app
+    volumes:
+      - ./tmp:/var/app/logs # куда сохранять логи локально
     depends_on:
       db:
         condition: service_healthy
