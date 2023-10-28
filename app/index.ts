@@ -2,9 +2,9 @@ import GRPCBackend from "./backend/GRPC-backend/grpc-backend";
 import BackendMock from "./backend/mock/backend";
 import VkBotsManager from "./manager/manager";
 import { PostrgesStore } from "./store/PostrgeSQL/postrgesql";
-import {postgres_config_docker, postgres_config_localhost} from "./store/PostrgeSQL/config";
 import {grpc_config} from "./backend/GRPC-backend/config";
 import logger from "./helpers/logger";
+import postgres_config from "./store/PostrgeSQL/config";
 
 const grpc = require('@grpc/grpc-js');
 
@@ -13,13 +13,13 @@ const grpc = require('@grpc/grpc-js');
     logger.info('Starting app...');
 
     // Init database
-    const db = new PostrgesStore(postgres_config_localhost);
+    const db = new PostrgesStore(postgres_config);
     await db.start();
 
     // Init backend
 
     // Mock backend
-    const backend = new BackendMock(postgres_config_localhost);
+    const backend = new BackendMock(postgres_config);
     await backend.start();
 
     // GRPC remote backend

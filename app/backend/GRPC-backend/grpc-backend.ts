@@ -2,6 +2,9 @@ import Backend, { ServerMessageToSlaveHandler } from "../backend";
 import { BotChatClient } from "./grpc/proto/model_grpc_pb";
 import { Message } from "./grpc/proto/model_pb";
 import grpcOptions from "./config";
+import logger from "../../helpers/logger";
+
+const backendLogger = logger.child({ class: 'GRPCbackend' });
 
 export default class GRPCBackend extends BotChatClient implements Backend {
 
@@ -16,13 +19,20 @@ export default class GRPCBackend extends BotChatClient implements Backend {
         this.toSlaveHandlers = [];
 
         this.stream.on('data', (data) => {
-            const text = data.array[0] as string;
-            const internal_chat_id = data.array[1] as number;
-            this.resendFromServerToSlave(internal_chat_id, text);
+
+            try {
+                const text = data.array[0] as string;
+                const internal_chat_id = data.array[1] as number;
+                backendLogger.debug({ text, internal_chat_id }, 'Get message from remote backend');
+                this.resendFromServerToSlave(internal_chat_id, text);
+            }
+            catch (e) {
+                backendLogger.warn(e, 'Cant parse message from remote backend');
+            }
         });
 
         this.stream.on('end', () => {
-            console.log('connection down\nNeed restart');
+            backendLogger.info('GRPC connection closed. Need restart');
             process.exit(0);
         });
     }
@@ -47,13 +57,17 @@ export default class GRPCBackend extends BotChatClient implements Backend {
         msg.setChatid(internal_chat_id);
         msg.setText(text);
 
-        console.log('GRPC sending ', text);
+        backendLogger.debug({ text, internal_chat_id }, 'Sending msg to remote backend');
         return new Promise(() => {
             this.stream.write(msg, (e: any) => {
-                console.log(`\tgrpc done. [${text}}]. Error is `, e);
                 if (!e) {
+                    backendLogger.warn({ text, internal_chat_id, e }, 'Message sent error');
+
                     return true;
                 }
+                
+                backendLogger.debug({ text, internal_chat_id }, 'Message sent success');
+
                 return false;
             });
         })
@@ -64,6 +78,6 @@ export default class GRPCBackend extends BotChatClient implements Backend {
     }
 
     public addHandleMessageFromServerToSlave(handler: ServerMessageToSlaveHandler): void {
-       this.toSlaveHandlers.push(handler);
+        this.toSlaveHandlers.push(handler);
     }
 }

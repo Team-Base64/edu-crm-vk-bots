@@ -1,9 +1,12 @@
 import { VK } from "vk-io";
-import {  NextMiddleware } from "middleware-io";
+import { NextMiddleware } from "middleware-io";
 import { ContextDefaultState, MessageContext } from "vk-io";
 import Store from "../store/store";
 import { gracefulStop } from "../helpers/graceful-stop";
 import Backend from "../backend/backend";
+import logger from "../helpers/logger";
+
+const vkBotLogger = logger.child({ class: 'VkBot' });
 
 interface CommandMiddleware {
     command: string | RegExp;
@@ -16,7 +19,7 @@ export default class VkBot {
 
     protected vk: VK;
     protected db: Store;
-    protected backend : Backend;
+    protected backend: Backend;
     protected group_id: number;
 
     constructor(token: string, name: string, db: Store, backend: Backend) {
@@ -32,9 +35,10 @@ export default class VkBot {
     }
 
     public async getBotGroupId() {
-        console.log('Getting bot group id');
+        vkBotLogger.debug('Getting vk group_id');
         const data = await this.vk.api.groups.getById({});
         if (!data[0].id) {
+            vkBotLogger.error('Getting vk group_id error');
             throw Error('Error while getting bot group id');
         }
 
@@ -42,45 +46,45 @@ export default class VkBot {
     }
 
     public async start() {
-        console.log('Starting bot ', this.name);
+        vkBotLogger.info(`Starting bot ${this.name}`);
 
         this.group_id = await this.getBotGroupId();
 
         if (this.vk.updates.isStarted) {
-            console.log(`Bot ${this.name} already started`);
+            vkBotLogger.debug(`Bot ${this.name} already started`);
             return Promise.resolve();
         }
 
-        this.vk.updates.start()
+        return this.vk.updates.start()
             .then(() => {
-                console.log(`Bot ${this.name} started successfully`);
+                vkBotLogger.info(`Bot ${this.name} started`);
                 return Promise.resolve();
             })
             .catch(e => {
-                console.log(`Bot ${this.name} started with error: \n\t ${e}`);
+                vkBotLogger.error(e, `Bot ${this.name} not started`);
                 Promise.reject();
             });
     }
 
     public async stop() {
-        console.log('Stopping bot ', this.name);
+        vkBotLogger.info(`Stopping bot ${this.name}`);
         if (!this.vk.updates.isStarted) {
-            console.log(`Bot ${this.name} already stopped`);
+            vkBotLogger.debug(`Bot ${this.name} already stopped`);
             return Promise.resolve();
         }
-        this.vk.updates.stop()
+        return this.vk.updates.stop()
             .then(() => {
-                console.log(`Bot ${this.name} stopped successfully`);
+                vkBotLogger.info(`Bot ${this.name} stopped`);
                 return Promise.resolve();
             })
             .catch(e => {
-                console.log(`Bot ${this.name} stopped with error: \n\t ${e}`);
+                vkBotLogger.error(e, `Bot ${this.name} not stopped`);
                 Promise.reject();
             });
     }
 
     public async sendMessageToClient(peer_id: number, text: string) {
-        this.vk.api.messages.send({
+        return this.vk.api.messages.send({
             peer_id: peer_id,
             message: text,
             random_id: Date.now() + peer_id,

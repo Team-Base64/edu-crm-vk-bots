@@ -1,46 +1,46 @@
-import {Client, ClientConfig} from "pg";
+import { Client, ClientConfig } from "pg";
 import { gracefulStop } from "../../helpers/graceful-stop";
 import Backend, { ServerMessageToSlaveHandler } from "../backend";
+import logger from "../../helpers/logger";
+
+const backendLogger = logger.child({ class: 'MOCKbackend' });
 
 class BackendMock implements Backend {
     db: Client;
     toSlaveHandler: ServerMessageToSlaveHandler[];
 
-    constructor(db_config : ClientConfig) {
+    constructor(db_config: ClientConfig) {
         this.db = new Client(db_config);
         this.toSlaveHandler = [];
-        gracefulStop(async () => {
-            await this.stop.bind(this);
-        });
+        gracefulStop(this.stop.bind(this));
     }
 
     public async start() {
-        console.log('Connecting to posrgres db');
-        this.db.connect().then(() => {
-            console.log('Connecting to posrgres db success');
+        backendLogger.info('Connecting to mock DB');
+        return this.db.connect().then(() => {
+            backendLogger.info('Connected to mock DB');
             return;
         })
             .catch(e => {
-                console.log('Failed to connect to postges db\n', e);
+                backendLogger.error(e, 'NOT Connected to mock DB');
                 return Promise.reject();
             });
     }
 
     public async stop() {
-        console.log('Disconnecting posrgres db');
+        backendLogger.info('Disconnecting posrgres db');
 
-        this.db.end().then(() => {
-            console.log('Disconnecting posrgres db ok');
+        return this.db.end().then(() => {
+            backendLogger.info('Disconnected posrgres db ok');
             return;
         })
             .catch(e => {
-                console.log('Disconnecting posrgres db not ok\n', e);
+                backendLogger.error(e, 'NOT disconnected from posrgres');
                 return;
             });
     }
 
     private async db_getToken(token: string): Promise<number | undefined> {
-        console.log('Backend: db get token');
         return this.db.query(`select expires
                               from tokens
                               where token = $1`,
@@ -48,47 +48,42 @@ class BackendMock implements Backend {
         )
             .then(data => {
                 if (!data.rows[0]?.expires) {
-                    console.log('here');
                     return undefined;
                 }
                 const expires = Number(data.rows[0].expires);
                 return expires;
             })
             .catch(e => {
-                console.log('Backend Mock get token error ', e);
+                backendLogger.error(e, 'DB Get token error ');
                 return undefined;
             });
     }
 
     public async db_createChat(): Promise<number | undefined> {
-        console.log('Backend: cheate chat');
-
         return this.db.query(`insert into internal_chats(slug)
                               values ($1)
                               returning internal_chat_id;`,
             ['slug'])
             .then(data => {
                 if (!data.rows[0]?.internal_chat_id) {
-                    console.log('Mock backend cant create chat');
+                    backendLogger.warn('DB cant create chat');
                     return undefined;
                 }
                 return Number(data.rows[0].internal_chat_id);
             })
             .catch(e => {
-                console.log('Mock backend cant create chat error ', e);
+                backendLogger.error(e, 'DB cant create chat');
                 return undefined;
             });
     }
 
     public async validateInviteToken(token: string): Promise<number | undefined> {
-        console.log('Backend validate token');
         // Смотрим токен в бд
         const expires = await this.db_getToken(token);
 
-        console.log(expires);
         // Если не нашли
         if (!expires) {
-            console.log('\t expires undefined');
+            backendLogger.debug('Validation token failed');
             return undefined;
         }
 
@@ -105,7 +100,7 @@ class BackendMock implements Backend {
 
 
     public resendMessageFromClient(internal_chat_id: number, text: string): Promise<boolean> {
-        console.log('MOCK-GRPC. Sending msg to sever ', text);
+        backendLogger.info({internal_chat_id, text}, 'MOCK-GRPC. Sending msg to sever ');
         return Promise.resolve(true);
     }
 

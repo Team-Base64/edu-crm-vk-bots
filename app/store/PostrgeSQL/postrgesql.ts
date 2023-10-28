@@ -1,12 +1,15 @@
 import { gracefulStop } from "../../helpers/graceful-stop";
+import logger from "../../helpers/logger";
 import Store, { VkBotData, VkBotLink } from "../store";
-import {Client, ClientConfig} from "pg";
+import { Client, ClientConfig } from "pg";
+
+const posrgresLogger = logger.child({ class: 'PostrgesStore' });
 
 export class PostrgesStore implements Store {
 
     db: Client;
 
-    constructor(config : ClientConfig) {
+    constructor(config: ClientConfig) {
         this.db = new Client(config);
 
         gracefulStop(async () => {
@@ -15,26 +18,25 @@ export class PostrgesStore implements Store {
     }
 
     public async start() {
-        console.log('Connecting to posrgres db');
-        this.db.connect().then(() => {
-            console.log('Connecting to posrgres db success');
+        posrgresLogger.info('Connecting to posrgres db');
+        return this.db.connect().then(() => {
+            posrgresLogger.info('Connected to posrgres db');
             return;
         })
             .catch(e => {
-                console.log('Failed to connect to postges db\n', e);
+                posrgresLogger.error(e, 'Posrgres db connection error ');
                 return Promise.reject();
             });
     }
 
     public async stop() {
-        console.log('Disconnecting posrgres db');
-
-        this.db.end().then(() => {
-            console.log('Disconnecting posrgres db ok');
+        posrgresLogger.info('Disconnecting posrgres db');
+        return this.db.end().then(() => {
+            posrgresLogger.info('Disconnected posrgres db');
             return;
         })
             .catch(e => {
-                console.log('Disconnecting posrgres db not ok\n', e);
+                posrgresLogger.error(e, 'Posrgres db disconnection error');
                 return;
             });
     }
@@ -46,7 +48,6 @@ export class PostrgesStore implements Store {
                                 and vk_user_id = $2;`,
             [group_id, peer_id])
             .then(data => {
-                console.log(data.rows);
                 if (!data.rows[0].internal_chat_id) {
                     return undefined;
                 }
@@ -54,7 +55,7 @@ export class PostrgesStore implements Store {
                 return internal_chat_id;
             })
             .catch(e => {
-                console.log('Postrges get internal_chat_id error');
+                posrgresLogger.error(e, 'Postrges get internal_chat_id error');
                 return undefined;
             });
     }
@@ -72,7 +73,7 @@ export class PostrgesStore implements Store {
                 return true;
             })
             .catch(e => {
-                console.log('Postrges cant link ', e);
+                posrgresLogger.error(e, 'Postrges link user to chat_id error');
                 return false;
             })
     }
@@ -87,14 +88,13 @@ export class PostrgesStore implements Store {
                                 AND bot_type = 'S';`,
             [peer_id])
             .then(data => {
-                console.log(data.rows);
                 const group_ids = data.rows.map(item => {
                     return item.vk_group_id;
                 })
                 return group_ids;
             })
             .catch(e => {
-                console.log('Postrges cant get free bots', e);
+                posrgresLogger.error(e, 'Postgres get free slave bots error');
                 return undefined;
             });
 
@@ -118,7 +118,7 @@ export class PostrgesStore implements Store {
                 })
             })
             .catch(e => {
-                console.log('Postrges get vk bots ', e);
+                posrgresLogger.error(e, 'Get bots error');
                 return undefined;
             });
     }
@@ -150,7 +150,7 @@ export class PostrgesStore implements Store {
                 return res;
             })
             .catch(e => {
-                console.log('Postrges get bot data via chat id ',e );
+                posrgresLogger.error(e, 'Postrges get bot data via chat id error');
                 return undefined;
             });
     }

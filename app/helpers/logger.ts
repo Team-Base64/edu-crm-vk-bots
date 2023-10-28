@@ -8,6 +8,7 @@ const logger = pino({
     levelFirst: true,
     destination: process.env.LOGDIR ? process.env.LOGDIR + `app_${Date.now()}.log` : 1,
     mkdir: true,
+    singleLine: true
 }));
 
 export default logger;
