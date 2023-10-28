@@ -10,6 +10,7 @@ const grpc = require('@grpc/grpc-js');
 
 // Main function
 (async () => {
+    console.log('Running app...');
     logger.info('Starting app...');
 
     // Init database

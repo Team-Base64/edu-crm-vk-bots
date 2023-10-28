@@ -101,7 +101,14 @@ class BackendMock implements Backend {
 
     public resendMessageFromClient(internal_chat_id: number, text: string): Promise<boolean> {
         backendLogger.info({internal_chat_id, text}, 'MOCK-GRPC. Sending msg to sever ');
-        return Promise.resolve(true);
+        
+        return new Promise(() => {
+            setTimeout( () => {
+        backendLogger.info({internal_chat_id, text}, 'MOCK-GRPC. msg SENT to sever ');
+
+                return Promise.resolve(true);
+            }, 3000);
+        });
     }
 
     public resendFromServerToSlave(internal_chat_id: number, text: string): void {
