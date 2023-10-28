@@ -1,0 +1,31 @@
+{
+  "name": "vk-slave-bots",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node index.ts",
+    "protogen": "sh build.sh"
+  },
+  "author": "George Illarionov",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.8.7",
+    "@types/pg": "^8.10.7",
+    "grpc_tools_node_protoc_ts": "^5.3.3",
+    "grpc-tools": "^1.12.4",
+    "node-json-db": "^2.3.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.9.7",
+    "@vk-io/scenes": "^1.2.1",
+    "@vk-io/session": "^2.2.1",
+    "pg": "^8.11.3",
+    "pino": "^8.16.1",
+    "pino-pretty": "^10.2.3",
+    "vk-io": "^4.8.3"
+  }
+}

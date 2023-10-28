@@ -6,13 +6,13 @@ services:
     ports:
       - "8000:5432"
     volumes:
-      - ./src/store/PostrgeSQL/SQL:/docker-entrypoint-initdb.d/
-      - ./tmp/postgres:/var/postgres_data  #<----- modify
+      - ./db:/docker-entrypoint-initdb.d/
+#      - ./tmp/postgres-data:/var/postgres_data  # Это для того чтобы после перезапуска докера база сохранялась
     environment:
       POSTGRES_USER: george
       POSTGRES_DB: vk_bots_db
       POSTGRES_PASSWORD: 1234567890
-#      PGDATA: /var/postgres_data        #<----- add
+#      PGDATA: /var/postgres_data        # Это для того чтобы после перезапуска докера база сохранялась
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d vk_bots_db -U george"]
       interval: 5s
@@ -22,15 +22,20 @@ services:
       - my-network
 
   app:
-    build: .
+    build:
+      context: ./app
+      args:
+        LOGDIR: /var/app/logs  # Куда в контейнере писать логи. Закомментить чтобы писалось в консоль контейнера
+        LOGLEVEL: 'debug'  # Уровень логов
+        DOCKER: true # Флагдля докера
     hostname: app
+    volumes:
+      - ./tmp:/var/app/logs # куда сохранять логи локально
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "8001:8001"
-    # links:
-      # - "db:db"
     networks:
       - my-network
 networks:
