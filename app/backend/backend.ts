@@ -2,7 +2,7 @@
 // TODO! Как понять какому пользователю мастер отправляет сообщение?
 // export type ServerMessageToMasterHandler = (internal_chat_id: number, text: string) => Promise<any>;
 
-import { BackendError, CreateChatRequest, CreateChatResponse, CreateStudentRequest, CreateStudentResponse, FileUploadRequest, FileUploadResponse, GetHomeworksRequest, GetHomeworksResponse, SendSolutionRequest, SendSolutionResponse, ServerMessageToSlaveHandler, ValidateTokenRequest, ValidateTokenResponse } from "./models";
+import { CreateChatRequest, CreateChatResponse, CreateStudentRequest, CreateStudentResponse, FileUploadRequest, FileUploadResponse, GetHomeworksRequest, GetHomeworksResponse, Message, SendSolutionRequest, SendSolutionResponse, ServerMessageToSlaveHandler, ValidateTokenRequest, ValidateTokenResponse } from "./models";
 
 export default abstract class Backend {
     // Проверка токена на валидность
@@ -24,7 +24,7 @@ export default abstract class Backend {
     public abstract sendHomeworkSolution(payload: SendSolutionRequest): Promise<SendSolutionResponse>;
 
     // Отправка сообщения от бота к бэку
-    public abstract resendMessageFromClient(internal_chat_id: number, text: string): Promise<boolean>;
+    public abstract resendMessageFromClient(payload: Message): Promise<boolean>;
 
     // Отправка сообщение от бэка к слейв боту
     public abstract resendFromServerToSlave(internal_chat_id: number, text: string): void;

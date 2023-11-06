@@ -2,7 +2,7 @@ import { Client, ClientConfig } from "pg";
 import { gracefulStop } from "../../helpers/graceful-stop";
 import Backend from "../backend";
 import logger from "../../helpers/logger";
-import { ValidateTokenRequest, ValidateTokenResponse, BackendError, CreateChatRequest, CreateChatResponse, GetHomeworksRequest, GetHomeworksResponse, FileUploadRequest, FileUploadResponse, CreateStudentRequest, CreateStudentResponse, SendSolutionRequest, SendSolutionResponse, HomeworkData, ServerMessageToSlaveHandler } from "../models";
+import { ValidateTokenRequest, ValidateTokenResponse, BackendError, CreateChatRequest, CreateChatResponse, GetHomeworksRequest, GetHomeworksResponse, FileUploadRequest, FileUploadResponse, CreateStudentRequest, CreateStudentResponse, SendSolutionRequest, SendSolutionResponse, HomeworkData, ServerMessageToSlaveHandler, Message } from "../models";
 
 const backendLogger = logger.child({ class: 'MOCKbackend' });
 
@@ -217,12 +217,13 @@ class BackendMock implements Backend {
             });
     }
 
-    public resendMessageFromClient(internal_chat_id: number, text: string): Promise<boolean> {
-        backendLogger.info({ internal_chat_id, text }, 'MOCK-GRPC. Sending msg to sever ');
+    public resendMessageFromClient(payload : Message): Promise<boolean> {
+        const {internal_chat_id, text, attachmentURLs} = payload;
+        backendLogger.info({ internal_chat_id, text, attachmentURLs }, 'MOCK-GRPC. Sending msg to sever ');
 
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                backendLogger.info({ internal_chat_id, text }, 'MOCK-GRPC. msg SENT to sever ');
+                backendLogger.info({ internal_chat_id, text, attachmentURLs }, 'MOCK-GRPC. msg SENT to sever ');
 
                 resolve(true);
             }, 3000);
