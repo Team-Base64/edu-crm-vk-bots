@@ -6,22 +6,22 @@ import { BackendError, CreateChatRequest, CreateChatResponse, CreateStudentReque
 
 export default abstract class Backend {
     // Проверка токена на валидность
-    public abstract validateInviteToken(payload: ValidateTokenRequest): Promise<ValidateTokenResponse | BackendError>;
+    public abstract validateInviteToken(payload: ValidateTokenRequest): Promise<ValidateTokenResponse>;
 
     // Создание чата
-    public abstract createChat(payload: CreateChatRequest): Promise<CreateChatResponse | BackendError>;
+    public abstract createChat(payload: CreateChatRequest): Promise<CreateChatResponse>;
 
     // Получение списка дз 
-    public abstract getHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse | BackendError>;
+    public abstract getHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse>;
 
     // Загрузка файла 
-    public abstract uploadFile(payload: FileUploadRequest): Promise<FileUploadResponse | BackendError>;
+    public abstract uploadFile(payload: FileUploadRequest): Promise<FileUploadResponse>;
 
     // Создание студента 
-    public abstract createStudent(payload: CreateStudentRequest): Promise<CreateStudentResponse | BackendError>;
+    public abstract createStudent(payload: CreateStudentRequest): Promise<CreateStudentResponse>;
 
     // Отправка решения дз
-    public abstract sendHomeworkSolution(payload: SendSolutionRequest): Promise<SendSolutionResponse | BackendError>;
+    public abstract sendHomeworkSolution(payload: SendSolutionRequest): Promise<SendSolutionResponse>;
 
     // Отправка сообщения от бота к бэку
     public abstract resendMessageFromClient(internal_chat_id: number, text: string): Promise<boolean>;

@@ -1,7 +1,8 @@
 export type ServerMessageToSlaveHandler = (internal_chat_id: number, text: string) => Promise<any>;
 
 export type BackendError = {
-    message ?: string;
+    isError ?: boolean;
+    error ?: string;
 }
 
 export type Message = {
@@ -55,26 +56,26 @@ export type FileUploadRequest = {
 
 // Responses
 
-export type ValidateTokenResponse = {
+export interface ValidateTokenResponse extends BackendError {
     class_id: number;
 }
 
-export type CreateStudentResponse = {
+export interface CreateStudentResponse extends BackendError {
     student_id: number;
 }
 
-export type CreateChatResponse = {
+export interface CreateChatResponse extends BackendError {
     internal_chat_id: number;
 }
 
-export type GetHomeworksResponse = {
+export interface GetHomeworksResponse extends BackendError {
     homeworks: HomeworkData[];
 }
 
-export type SendSolutionResponse = {
+export interface SendSolutionResponse extends BackendError {
 
 }
 
-export type FileUploadResponse = {
+export interface FileUploadResponse extends BackendError {
     internalFileURL: string;
 }
