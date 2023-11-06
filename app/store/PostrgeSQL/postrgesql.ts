@@ -17,6 +17,45 @@ export class PostrgesStore implements Store {
         });
     }
 
+    public async getStudentId(peer_id: number): Promise<number | undefined> {
+        return this.db.query(`select student_id
+                                from link_user_student
+                                where vk_user_id = $1;`,
+            [peer_id])
+            .then(data => {
+                if (!data.rowCount) {
+                    posrgresLogger.debug(peer_id, 'VK user not linked to student');
+                    return -1;
+                }
+
+                const student_id = data.rows[0].student_id;
+
+                return Number(student_id);
+            })
+            .catch(e => {
+                posrgresLogger.error(e, 'Postgres get student_id error');
+                return undefined;
+            });
+
+    }
+
+    public async linkStudent(peer_id: number, student_id: number): Promise<boolean> {
+        return this.db.query(`insert into link_user_student(vk_user_id, student_id)
+                            values($1, $2);`,
+                            [peer_id, student_id])
+            .then(data => {
+                if(data.rowCount < 1){
+                    posrgresLogger.warn('Postgres link vk user and student error');
+                    return false;
+                }
+
+                return true;
+            }).catch(e => {
+                posrgresLogger.error(e, 'Postgres link vk user and student error');
+                return false;
+            });
+    }
+
     public async start() {
         posrgresLogger.info('Connecting to posrgres db');
         return this.db.connect().then(() => {

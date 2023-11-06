@@ -15,7 +15,15 @@ export interface VkBotLink {
     vk_group_id : number;
 }
 
+
 export default abstract class Store {
+
+    // Получить студента по vk_id
+    public abstract getStudentId(peer_id : number) : Promise<number | undefined>;
+
+    // Привязать стуента к vk_id
+    public abstract linkStudent (peer_id : number , student_id : number ) : Promise<boolean>;
+
     // По данным vk_user + vk_bot получить chat_id, к которому он привязан
     public abstract getInternalChatId(peer_id: number, group_id: number): Promise<number | undefined>;
 
