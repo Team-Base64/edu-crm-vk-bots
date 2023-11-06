@@ -2,7 +2,7 @@ import VkBot from "../vk-bot/vk-bot"
 import Store from "../store/store";
 import Backend from "../backend/backend";
 
-import { ContextDefaultState, MessageContext } from "vk-io";
+import { Attachment, AttachmentType, ContextDefaultState, MessageContext, PhotoAttachment } from "vk-io";
 import logger from "../helpers/logger";
 
 const slaveBotLogger = logger.child({ class: 'SlaveVkBot' });
@@ -24,7 +24,7 @@ export default class VkSlaveBot extends VkBot {
     }
 
     private async handleMessage(context: MessageContext<ContextDefaultState>): Promise<boolean> {
-        const { peerId, $groupId, text } = context;
+        const { peerId, $groupId, text, attachments } = context;
         slaveBotLogger.debug({peerId}, 'Get message ');
 
         if (!$groupId) {
@@ -45,11 +45,29 @@ export default class VkSlaveBot extends VkBot {
             return false;
         }
 
+        // Работа с вложениями
+        // Проверить есть ли вложения
+        const attachmentUrls :string[] =  [];
+        if(attachments){
+            // для каждого вложения
+            attachments.forEach((a)=> {
+                // Если фото
+                if(a.type === AttachmentType.PHOTO){
+                   // Получаем url
+                    const {largeSizeUrl} : any = a.toJSON(); 
+                    if(largeSizeUrl){
+                        attachmentUrls.push(largeSizeUrl);
+                    } 
+                }
+            });
+        }
+        
+        
+
         // Собрать сообщение
         // Отправить сообщение на бэкэнд
         slaveBotLogger.debug('Sending msg to backend');
         const isOk = await this.backend.resendMessageFromClient(internal_chat_id, text || '');
-
         if (!isOk) {
             slaveBotLogger.warn('Sending msg to backend failed');
             this.sendMessageToClient(peerId, 'Сообщение не доставлено');
@@ -61,6 +79,6 @@ export default class VkSlaveBot extends VkBot {
         // message: - текстовое сообщение
         // group_id: - id группы вк где бот - не обязательно!!!
 
-        return true;
+        return Promise.resolve(true);
     }
 }
