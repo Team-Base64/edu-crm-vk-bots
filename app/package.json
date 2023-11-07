@@ -21,8 +21,10 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.7",
+    "@types/mime": "^3.0.3",
     "@vk-io/scenes": "^1.2.1",
     "@vk-io/session": "^2.2.1",
+    "mime": "^3.0.0",
     "pg": "^8.11.3",
     "pino": "^8.16.1",
     "pino-pretty": "^10.2.3",

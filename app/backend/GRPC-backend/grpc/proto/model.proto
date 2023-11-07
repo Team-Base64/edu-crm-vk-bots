@@ -1,15 +1,107 @@
-// grpc_tools_node_protoc --js_out=import_style=commonjs,binary:.
-// --grpc_out=grpc_js:. proto/model.proto
 syntax = "proto3";
 
 package chat;
+
 option go_package = "./chat";
 
+// Models 
+
 message Message {
-  string text = 1;
-  int32 chatID = 2;
+    int32 chatID = 1;
+    string text = 2;
+    repeated string attachmentURLs = 3;
 }
 
-message Status { bool isSuccessful = 1; }
+message HomeworkData {
+    int32 homeworkID = 1;
+    string title = 2;
+    string description = 3;
+    repeated string attachmentURLs = 4;
+}
 
-service BotChat { rpc StartChatVK(stream Message) returns (stream Message); }
+message SolutionData {
+    string text = 1;
+    repeated string attachmentURLs = 2;
+}
+
+
+// Requests 
+message ValidateTokenRequest {
+    string token = 1;
+}
+
+message CreateStudentRequest {
+    string name = 1;
+    string type = 2; // TG VK
+    string avatarURL = 3;
+}
+
+message CreateChatRequest {
+    int32 studentID = 1;
+    int32 classID = 2; // Бэк по классу получит препода
+}
+
+message GetHomeworksRequest {
+    int32 classID = 1;
+}
+
+message SendSolutionRequest {
+    int32 homeworkID = 1;
+    SolutionData solution = 2;
+    int32 studentID = 3;
+}
+
+message FileUploadRequest {
+    string mimetype = 1;
+    string fileURL = 2;
+}
+
+// Responses 
+
+message ValidateTokenResponse {
+    int32 classID = 1;
+}
+
+message CreateStudentResponse {
+    int32 studentID = 1;
+}
+
+message CreateChatResponse {
+    int32 internalChatID = 1;
+}
+
+message GetHomeworksResponse {
+    repeated HomeworkData homeworks = 1;
+}
+
+message SendSolutionResponse {
+
+}
+
+message FileUploadResponse {
+    string internalFileURL = 1;
+}
+
+service BotService { 
+    rpc StartChatVK(stream Message) returns (stream Message);
+
+    rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+    rpc CreateChat (CreateChatRequest) returns (CreateChatResponse);
+    rpc GetHomeworks (GetHomeworksRequest) returns (GetHomeworksResponse);
+    rpc UploadFile (FileUploadRequest) returns (FileUploadResponse);
+    rpc CreateStudent(CreateStudentRequest) returns (CreateStudentResponse);
+    rpc SendSolution (SendSolutionRequest) returns (SendSolutionResponse);
+}
+
+
+// ПОТОМ 
+
+    // ПОтом 
+    // rpc startNotification() returns (stream Event);
+// message Event {
+//     oneof payload {
+//         Message message = 1;
+//         HomeworkData new_homework = 1;
+//         // В будущем уведомления
+//     }
+// }

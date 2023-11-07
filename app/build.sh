@@ -2,7 +2,7 @@
 
 
 
-dir=src/backend/GRPC-backend/grpc
+dir=backend/GRPC-backend/grpc
 
 npx grpc_tools_node_protoc \
     --js_out=import_style=commonjs,binary:. \

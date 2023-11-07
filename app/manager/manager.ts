@@ -1,4 +1,5 @@
 import Backend from "../backend/backend";
+import { MessagePayload } from "../backend/models";
 import logger from "../helpers/logger";
 import { VkMasterBot } from "../master-vk-bot/master-bot";
 import VkSlaveBot from "../slave-vk-bot/slave-bot";
@@ -7,7 +8,9 @@ import VkBot from "../vk-bot/vk-bot";
 
 const grpc = require('@grpc/grpc-js');
 
-const managerLogger = logger.child({ class: 'VkBotsManager' });
+const managerLogger = logger.child({}, {
+    msgPrefix: 'VkBotsManager: '
+});
 
 export default class VkBotsManager {
     db: Store;
@@ -106,13 +109,13 @@ export default class VkBotsManager {
         }
     }
 
-    public async sendToSlave(internal_chat_id: number, text: string) {
-        const sendLogger = managerLogger.child({ func: 'SendToSlave' });
+    public async sendToSlave(payload: MessagePayload) {
+        const { internal_chat_id } = payload;
+        managerLogger.debug('Handle message from server');
 
-        sendLogger.debug({ internal_chat_id }, 'Get bot data using internal chat_id');
         const data = await this.db.getTargetViaInternalChatId(internal_chat_id);
         if (!data) {
-            sendLogger.warn({ internal_chat_id }, 'Bot for this chat_id does not exist in DB');
+            managerLogger.warn({ internal_chat_id }, 'Bot not linked');
             return;
         }
 
@@ -120,13 +123,10 @@ export default class VkBotsManager {
 
         const targ_bot = this.slaves.get(vk_group_id);
         if (!targ_bot) {
-            sendLogger.warn({ internal_chat_id }, 'Bot for this chat_id does not exist in Manager');
+            managerLogger.warn({ internal_chat_id }, 'Bot not inited');
             return;
         }
 
-        sendLogger.debug('Redirecting message to bot instance');
-        return targ_bot.sendMessageToClient(peer_id, text);
+        return targ_bot.sendMessageToClient(peer_id, payload.text);
     }
-
-    // public async sendToMaster()
 }

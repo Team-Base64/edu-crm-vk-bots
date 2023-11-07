@@ -3,7 +3,9 @@ import logger from "../../helpers/logger";
 import Store, { VkBotData, VkBotLink } from "../store";
 import { Client, ClientConfig } from "pg";
 
-const posrgresLogger = logger.child({ class: 'PostrgesStore' });
+const posrgresLogger = logger.child({}, {
+    msgPrefix: 'PostrgesStore'
+});
 
 export class PostrgesStore implements Store {
 
@@ -17,55 +19,95 @@ export class PostrgesStore implements Store {
         });
     }
 
+    public async getStudentId(peer_id: number): Promise<number | undefined> {
+        return this.db.query(`select student_id
+                                from link_user_student
+                                where vk_user_id = $1;`,
+            [peer_id])
+            .then(data => {
+                if (!data.rowCount) {
+                    posrgresLogger.debug(peer_id, 'VK user not linked to student');
+                    return -1;
+                }
+
+                const student_id = data.rows[0].student_id;
+
+                return Number(student_id);
+            })
+            .catch(e => {
+                posrgresLogger.error(e, 'Get student_id error');
+                return undefined;
+            });
+
+    }
+
+    public async linkStudent(peer_id: number, student_id: number): Promise<boolean> {
+        return this.db.query(`insert into link_user_student(vk_user_id, student_id)
+                            values($1, $2);`,
+            [peer_id, student_id])
+            .then(data => {
+                if (data.rowCount < 1) {
+                    posrgresLogger.warn('Link vk user and student error');
+                    return false;
+                }
+
+                return true;
+            }).catch(e => {
+                posrgresLogger.error(e, 'Link vk user and student error');
+                return false;
+            });
+    }
+
     public async start() {
-        posrgresLogger.info('Connecting to posrgres db');
+        posrgresLogger.info('Connecting to db');
         return this.db.connect().then(() => {
-            posrgresLogger.info('Connected to posrgres db');
+            posrgresLogger.info('Connected to db');
             return;
         })
             .catch(e => {
-                posrgresLogger.error(e, 'Posrgres db connection error ');
+                posrgresLogger.error(e, 'db connection error ');
                 return Promise.reject();
             });
     }
 
     public async stop() {
-        posrgresLogger.info('Disconnecting posrgres db');
+        posrgresLogger.info('Disconnecting db');
         return this.db.end().then(() => {
-            posrgresLogger.info('Disconnected posrgres db');
+            posrgresLogger.info('Disconnected db');
             return;
         })
             .catch(e => {
-                posrgresLogger.error(e, 'Posrgres db disconnection error');
+                posrgresLogger.error(e, 'db disconnection error');
                 return;
             });
     }
 
-    public async getInternalChatId(peer_id: number, group_id: number): Promise<number | undefined> {
-        return this.db.query(`select internal_chat_id
+    public async getInternalChatId(peer_id: number, group_id: number): Promise<{ class_id: number, internal_chat_id: number } | undefined> {
+        return this.db.query(`select internal_chat_id, class_id
                               from link_user_bot_chat
                               where vk_group_id = $1
                                 and vk_user_id = $2;`,
             [group_id, peer_id])
             .then(data => {
-                if (!data.rows[0].internal_chat_id) {
+                if (!data.rows[0]) {
                     return undefined;
                 }
                 const internal_chat_id = data.rows[0].internal_chat_id;
-                return internal_chat_id;
+                const class_id = data.rows[0].class_id;
+                return { internal_chat_id: internal_chat_id, class_id: class_id };
             })
             .catch(e => {
-                posrgresLogger.error(e, 'Postrges get internal_chat_id error');
+                posrgresLogger.error(e, 'Get internal_chat_id error');
                 return undefined;
             });
     }
 
-    public setInternalChatId(peer_id: number, group_id: number, internal_chat_id: number): Promise<boolean> {
+    public setInternalChatId(peer_id: number, group_id: number, internal_chat_id: number, class_id: number): Promise<boolean> {
         return this.db.query(`insert into link_user_bot_chat
-                                  (internal_chat_id, vk_group_id, vk_user_id)
-                              values ($1, $2, $3)
+                                  (internal_chat_id, vk_group_id, vk_user_id, class_id)
+                              values ($1, $2, $3, $4)
                               returning internal_chat_id;`,
-            [internal_chat_id, group_id, peer_id])
+            [internal_chat_id, group_id, peer_id, class_id])
             .then(data => {
                 if (data.rowCount < 1) {
                     return false;
@@ -73,7 +115,7 @@ export class PostrgesStore implements Store {
                 return true;
             })
             .catch(e => {
-                posrgresLogger.error(e, 'Postrges link user to chat_id error');
+                posrgresLogger.error(e, 'Link user to chat_id error');
                 return false;
             })
     }
@@ -94,7 +136,7 @@ export class PostrgesStore implements Store {
                 return group_ids;
             })
             .catch(e => {
-                posrgresLogger.error(e, 'Postgres get free slave bots error');
+                posrgresLogger.error(e, 'Get free slave bots error');
                 return undefined;
             });
 
@@ -150,7 +192,7 @@ export class PostrgesStore implements Store {
                 return res;
             })
             .catch(e => {
-                posrgresLogger.error(e, 'Postrges get bot data via chat id error');
+                posrgresLogger.error(e, 'Get bot data via chat id error');
                 return undefined;
             });
     }

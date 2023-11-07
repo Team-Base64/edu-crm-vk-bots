@@ -6,8 +6,6 @@ import {grpc_config} from "./backend/GRPC-backend/config";
 import logger from "./helpers/logger";
 import postgres_config from "./store/PostrgeSQL/config";
 
-const grpc = require('@grpc/grpc-js');
-
 // Main function
 (async () => {
     console.log('Running app...');

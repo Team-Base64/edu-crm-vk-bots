@@ -16,7 +16,9 @@ export interface InviteData {
     peer_id: number,
 }
 
-const masterBotLogger = logger.child({ class: 'VkMasterBot' });
+const masterBotLogger = logger.child({}, { 
+    msgPrefix: 'VkMasterBot: ' 
+});
 
 export class VkMasterBot extends VkBot {
 
@@ -77,40 +79,99 @@ export class VkMasterBot extends VkBot {
 
         // Проверить токен на валидность на бэке 
         const { invite_token, peer_id } = data;
-        const expires = await this.backend.validateInviteToken(invite_token);
 
-        // Если не ок, получить undefined
-        if (!expires) {
-            masterBotLogger.debug({invite_token}, 'Invite token not found');
+        const { class_id, ...validateTokenError } = await this.backend.validateInviteToken({ token: invite_token });
+
+        // Если не ок
+        if (validateTokenError.isError) {
+            masterBotLogger.debug({ invite_token }, 'Invite token not found');
             this.sendMessageToClient(peer_id, 'Не нашли токен для приглашения ' + invite_token);
             return;
         }
 
         // Если ок, 
 
+        // Посмотреть привязан ли ВК к студенту 
+        masterBotLogger.debug({ peer_id }, 'Checking link vk - stundent');
+
+        let current_student_id = await this.db.getStudentId(peer_id);
+
+        // ошибка undefined        
+        if (!current_student_id) {
+            masterBotLogger.warn('Get student_id error');
+            this.sendMessageToClient(peer_id, 'Ошибка проверки аккаунта. Повторите позже');
+            return;
+        }
+
+        // НЕТ id == -1
+        if (current_student_id < 0) {
+            masterBotLogger.debug({ peer_id }, 'Student not exist');
+
+            // Получаем данные 
+            const users = await this.vk.api.users.get({ user_ids: [peer_id] })
+            const user = users[0];
+
+            // имя фамилию
+            const { first_name, last_name } = user;
+
+            // Регаем
+            masterBotLogger.debug({ peer_id, first_name, last_name }, 'Registration of student');
+
+            const { isError, error, student_id } = await this.backend.createNewStudent({
+                name: [first_name, last_name].join(' '),
+                type: 'vk',
+            });
+
+
+            // Если ошибка 
+            if (isError) {
+                masterBotLogger.warn(error, 'Create student error');
+                this.sendMessageToClient(peer_id, 'Не можем зарегистрировать');
+                return;
+            }
+
+            // Если ок, то линкуем
+            masterBotLogger.debug({ peer_id, student_id }, 'Link new student to vk');
+
+            const isOk = await this.db.linkStudent(peer_id, student_id);
+
+            if (!isOk) {
+                masterBotLogger.warn('Не получилось связать ВК и студента');
+                this.sendMessageToClient(peer_id, 'Не получилось привязать вк');
+                return;
+            }
+
+            current_student_id = student_id;
+        }
+
+        // ДА id > 0 или зарегали
+
+        // TODO привязан ли он к классу
+
         // Посмтреть есть ли свободные боты 
-        masterBotLogger.debug({peer_id}, 'Checking vacant bots for');
+        masterBotLogger.debug({ peer_id, current_student_id }, 'Checking vacant bots for');
         const free_bot_groups_ids = await this.db.getFreeSlaveBots(peer_id);
 
         // Ошибка при получении ботов
         if (!free_bot_groups_ids) {
-            masterBotLogger.error({peer_id}, 'Check vacant bots error for');
+            masterBotLogger.error({ peer_id }, 'Check vacant bots error for');
             this.sendMessageToClient(peer_id, 'Повторите запрос позже');
             return;
         }
 
         // Нет свободных ботов
         if (free_bot_groups_ids.length < 1) {
-            masterBotLogger.debug({peer_id}, 'Vacant bots not found for');
+            masterBotLogger.debug({ peer_id }, 'Vacant bots not found for');
             this.sendMessageToClient(peer_id, 'Все боты заняты :с');
             return;
         }
 
+        // Есть свободные боты 
         // получить internal_chat_id (создать чат на бэке)
         masterBotLogger.debug('Creating chat');
-        const internal_chat_id = await this.backend.createChat();
+        const { internal_chat_id, ...createChatError } = await this.backend.createInternalChat({ class_id: class_id, student_id: current_student_id });
 
-        if (!internal_chat_id) {
+        if (createChatError.isError) {
             masterBotLogger.error('Creating chat error');
             this.sendMessageToClient(peer_id, 'Что-то пошло не так');
             return;
@@ -124,7 +185,7 @@ export class VkMasterBot extends VkBot {
 
         // Привязать бота к новому чату
         masterBotLogger.debug({ peer_id, group_id, internal_chat_id }, 'Linking vacant bot ');
-        const isOk = await this.db.setInternalChatId(peer_id, group_id, internal_chat_id);
+        const isOk = await this.db.setInternalChatId(peer_id, group_id, internal_chat_id, class_id);
 
         if (!isOk) {
             masterBotLogger.error({ peer_id, group_id, internal_chat_id }, 'Linking vacant bot error');

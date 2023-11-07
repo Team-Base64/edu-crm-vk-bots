@@ -6,7 +6,9 @@ import { gracefulStop } from "../helpers/graceful-stop";
 import Backend from "../backend/backend";
 import logger from "../helpers/logger";
 
-const vkBotLogger = logger.child({ class: 'VkBot' });
+const vkBotLogger = logger.child({}, {
+    msgPrefix: 'VkBotShared: ',
+});
 
 interface CommandMiddleware {
     command: string | RegExp;
@@ -115,12 +117,14 @@ export default class VkBot {
                 for (let mw of cmdMiddleware) {
                     if (mw.command instanceof RegExp) {
                         if (mw.command.test(check_value as string)) {
+                            context.state.isCommand = true;
                             await mw.handler(context);
                             // return next();
                             break;
                         }
                     } else if (typeof mw.command === 'string') {
                         if (mw.command === check_value) {
+                            context.state.isCommand = true;
                             await mw.handler(context);
                             // return next();
                             break;
