@@ -96,7 +96,7 @@ export default class VkSlaveBot extends VkBot {
 
         const { class_id } = resp;
 
-        const { homeworks, ...getHomeworksError } = await this.backend.getHomeworks({
+        const { homeworks, ...getHomeworksError } = await this.backend.getClassHomeworks({
             class_id: class_id,
         });
 

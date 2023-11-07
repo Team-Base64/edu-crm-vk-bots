@@ -29,7 +29,7 @@ class BackendMock implements Backend {
         return { isError: true, error: 'Validation token error', class_id: 0 };
     }
 
-    public async createChat(payload: CreateChatRequest): Promise<CreateChatResponse> {
+    public async createInternalChat(payload: CreateChatRequest): Promise<CreateChatResponse> {
         const { student_id, class_id } = payload;
         const chat_id = await this.db_createChat(student_id, class_id);
         if (chat_id) {
@@ -39,7 +39,7 @@ class BackendMock implements Backend {
         return { isError: true, error: 'Cant create chat', internal_chat_id : 0 };
     }
 
-    public async getHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse> {
+    public async getClassHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse> {
         const { class_id } = payload;
         const hws = await this.db_getHomeworks(class_id);
         console.log('MOCK: getHws', class_id, hws);
@@ -52,7 +52,7 @@ class BackendMock implements Backend {
 
     }
 
-    public uploadFile(payload: FileUploadRequest): Promise<FileUploadResponse> {
+    public uploadAttachment(payload: FileUploadRequest): Promise<FileUploadResponse> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 return resolve({ internalFileURL: payload.fileURL });
@@ -60,7 +60,7 @@ class BackendMock implements Backend {
         });
     }
 
-    public async createStudent(payload: CreateStudentRequest): Promise<CreateStudentResponse> {
+    public async createNewStudent(payload: CreateStudentRequest): Promise<CreateStudentResponse> {
         const student_id = await this.db_createStudent(payload.name);
 
         if (student_id) {

@@ -14,7 +14,7 @@ export namespace SendSolutionScene {
                     // console.log('Step 1 fst time', context.scene.step.firstTime);
                     if (context.scene.step.firstTime) {
                         const { class_id } = context.state;
-                        const { homeworks, ...homeworksError } = await backend.getHomeworks({ class_id: class_id });
+                        const { homeworks, ...homeworksError } = await backend.getClassHomeworks({ class_id: class_id });
                         if (homeworksError.isError) {
                             await context.send('Ошибка получения ДЗ');
                             return context.scene.leave();

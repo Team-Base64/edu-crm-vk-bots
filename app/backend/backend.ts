@@ -9,16 +9,16 @@ export default abstract class Backend {
     public abstract validateInviteToken(payload: ValidateTokenRequest): Promise<ValidateTokenResponse>;
 
     // Создание чата
-    public abstract createChat(payload: CreateChatRequest): Promise<CreateChatResponse>;
+    public abstract createInternalChat(payload: CreateChatRequest): Promise<CreateChatResponse>;
 
     // Получение списка дз 
-    public abstract getHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse>;
+    public abstract getClassHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse>;
 
     // Загрузка файла 
-    public abstract uploadFile(payload: FileUploadRequest): Promise<FileUploadResponse>;
+    public abstract uploadAttachment(payload: FileUploadRequest): Promise<FileUploadResponse>;
 
     // Создание студента 
-    public abstract createStudent(payload: CreateStudentRequest): Promise<CreateStudentResponse>;
+    public abstract createNewStudent(payload: CreateStudentRequest): Promise<CreateStudentResponse>;
 
     // Отправка решения дз
     public abstract sendHomeworkSolution(payload: SendSolutionRequest): Promise<SendSolutionResponse>;
