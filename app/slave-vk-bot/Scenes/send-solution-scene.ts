@@ -34,6 +34,12 @@ export namespace SendSolutionScene {
         return new StepScene(name, {
             steps: [
                 async (context) => {
+                    const hw_id = context?.messagePayload?.homework_id;
+                    if (hw_id) {
+                        context.scene.state.homework_id = hw_id;
+                        return context.scene.step.next();
+                    }
+                    
                     const { class_id } = context.state;
 
                     if (!class_id) {
@@ -41,6 +47,7 @@ export namespace SendSolutionScene {
                         return context.scene.leave();
                     }
 
+                   
                     const page = context?.messagePayload?.page || 0;
 
                     const homeworks = await getHomeworks(backend, class_id, page);
@@ -65,12 +72,6 @@ export namespace SendSolutionScene {
                         message: `Страница ${page + 1}`,
                         keyboard: kb,
                     });
-
-                    const hw_id = context?.messagePayload?.homework_id;
-                    if (hw_id) {
-                        context.scene.state.homework_id = hw_id;
-                        return context.scene.step.next();
-                    }
                 },
 
                 async (context) => {

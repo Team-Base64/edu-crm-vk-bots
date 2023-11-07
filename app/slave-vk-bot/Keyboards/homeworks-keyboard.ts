@@ -7,16 +7,6 @@ const hwsOnPage = 4;
 export const HomeworksKeyboard = (homeworks: HomeworkPayload[], page: number) => {
     const { data, isFirstPage, isLastPage } = paginate(homeworks, page, hwsOnPage);
 
-    const content = data.map(hw => {
-        return Keyboard.textButton({
-            label: hw.title,
-            payload: {
-                homework_id: hw.homework_id,
-            },
-            color: "primary",
-        });
-    });
-
     const prev = isFirstPage ?
         []
         :
@@ -45,7 +35,15 @@ export const HomeworksKeyboard = (homeworks: HomeworkPayload[], page: number) =>
 
     const builder = Keyboard.keyboard(
         [
-            ...content,
+            ...data.map(hw => {
+                return Keyboard.textButton({
+                    label: hw.title,
+                    payload: {
+                        homework_id: hw.homework_id,
+                    },
+                    color: "primary",
+                });
+            }),
             [
                 ...prev,
                 ...next,

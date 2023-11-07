@@ -74,10 +74,10 @@ class BackendMock implements Backend {
         const id = await this.db_createSolution(text, attachmentURLs);
 
         if (id) {
-            backendLogger.debug(id, 'MOCK solution отправлено');
+            backendLogger.debug({id}, 'MOCK solution отправлено');
             return {};
         }
-        backendLogger.error(id, 'MOCK solution ошибка отправки');
+        backendLogger.error({id}, 'MOCK solution ошибка отправки');
 
         return {
             isError: true,

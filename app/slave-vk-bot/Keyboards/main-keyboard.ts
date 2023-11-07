@@ -15,4 +15,5 @@ export const MainKeyboard = Keyboard.builder()
         command: '/homeworks'
     },
     color: "secondary",
-});
+})
+.oneTime();
