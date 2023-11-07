@@ -1,82 +1,82 @@
-export type ServerMessageToSlaveHandler = (internal_chat_id: number, text: string) => Promise<any>;
+export type ServerMessageToSlaveHandler = (payload : MessagePayload) => Promise<any>;
 
 export type BackendError = {
     isError ?: boolean;
     error ?: string;
 }
 
-export type Message = {
+export type MessagePayload = {
     internal_chat_id: number;
     text: string;
     attachmentURLs: string[];
 };
 
-export type HomeworkData = {
+export type HomeworkPayload = {
     homework_id: number;
     title: string;
     description: string;
     attachmentURLs: string[];
 };
 
-export type SolutionData = {
+export type SolutionPayload = {
     text: string;
     attachmentURLs: string[];
 };
 
 // Requests
-export type ValidateTokenRequest = {
+export type ValidateTokenPayload = {
     token: string;
 };
 
 export type SocialNetworkType = 'tg' | 'vk';
 
-export type CreateStudentRequest = {
+export type CreateStudentPayload = {
     name: string;
     type: SocialNetworkType;
 };
 
-export type CreateChatRequest = {
+export type CreateChatPayload = {
     student_id: number;
     class_id: number;
 }
 
-export type GetHomeworksRequest = {
+export type GetHomeworksPayload = {
     class_id: number;
 }
 
-export type SendSolutionRequest = {
+export type SendSolutionPayload = {
     student_id : number;
     homework_id: number;
-    solution: SolutionData;
+    solution: SolutionPayload;
 }
 
-export type FileUploadRequest = {
+export type FileUploadPayload = {
     mimetype: string;
     fileURL: string;
 }
 
 // Responses
 
-export interface ValidateTokenResponse extends BackendError {
+export interface ValidateTokenResult extends BackendError {
     class_id: number;
 }
 
-export interface CreateStudentResponse extends BackendError {
+export interface CreateStudentResult extends BackendError {
     student_id: number;
 }
 
-export interface CreateChatResponse extends BackendError {
+export interface CreateChatResult extends BackendError {
     internal_chat_id: number;
 }
 
-export interface GetHomeworksResponse extends BackendError {
-    homeworks: HomeworkData[];
+export interface GetHomeworksResult extends BackendError {
+    homeworks: HomeworkPayload[];
 }
 
-export interface SendSolutionResponse extends BackendError {
+export interface SendSolutionResult extends BackendError {
 
 }
 
-export interface FileUploadResponse extends BackendError {
+export interface FileUploadResult extends BackendError {
     internalFileURL: string;
 }

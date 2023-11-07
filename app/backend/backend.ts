@@ -2,32 +2,32 @@
 // TODO! Как понять какому пользователю мастер отправляет сообщение?
 // export type ServerMessageToMasterHandler = (internal_chat_id: number, text: string) => Promise<any>;
 
-import { CreateChatRequest, CreateChatResponse, CreateStudentRequest, CreateStudentResponse, FileUploadRequest, FileUploadResponse, GetHomeworksRequest, GetHomeworksResponse, Message, SendSolutionRequest, SendSolutionResponse, ServerMessageToSlaveHandler, ValidateTokenRequest, ValidateTokenResponse } from "./models";
+import { ValidateTokenPayload, ValidateTokenResult, CreateChatPayload, CreateChatResult, GetHomeworksPayload, GetHomeworksResult, FileUploadPayload, FileUploadResult, CreateStudentPayload, CreateStudentResult, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, MessagePayload } from "./models";
 
 export default abstract class Backend {
     // Проверка токена на валидность
-    public abstract validateInviteToken(payload: ValidateTokenRequest): Promise<ValidateTokenResponse>;
+    public abstract validateInviteToken(payload: ValidateTokenPayload): Promise<ValidateTokenResult>;
 
     // Создание чата
-    public abstract createInternalChat(payload: CreateChatRequest): Promise<CreateChatResponse>;
+    public abstract createInternalChat(payload: CreateChatPayload): Promise<CreateChatResult>;
 
     // Получение списка дз 
-    public abstract getClassHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse>;
+    public abstract getClassHomeworks(payload: GetHomeworksPayload): Promise<GetHomeworksResult>;
 
     // Загрузка файла 
-    public abstract uploadAttachment(payload: FileUploadRequest): Promise<FileUploadResponse>;
+    public abstract uploadAttachment(payload: FileUploadPayload): Promise<FileUploadResult>;
 
     // Создание студента 
-    public abstract createNewStudent(payload: CreateStudentRequest): Promise<CreateStudentResponse>;
+    public abstract createNewStudent(payload: CreateStudentPayload): Promise<CreateStudentResult>;
 
     // Отправка решения дз
-    public abstract sendHomeworkSolution(payload: SendSolutionRequest): Promise<SendSolutionResponse>;
+    public abstract sendHomeworkSolution(payload: SendSolutionPayload): Promise<SendSolutionResult>;
 
     // Отправка сообщения от бота к бэку
-    public abstract resendMessageFromClient(payload: Message): Promise<boolean>;
+    public abstract resendMessageFromClient(payload: MessagePayload): Promise<boolean>;
 
     // Отправка сообщение от бэка к слейв боту
-    public abstract resendFromServerToSlave(internal_chat_id: number, text: string): void;
+    public abstract resendFromServerToSlave(payload : MessagePayload): void;
     public abstract addHandleMessageFromServerToSlave(handler: ServerMessageToSlaveHandler): void;
 
     // TODO 
