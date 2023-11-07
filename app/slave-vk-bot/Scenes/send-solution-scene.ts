@@ -1,8 +1,31 @@
 import { StepScene } from "@vk-io/scenes";
-import { HomeworksInlineKeyboard } from "../Keyboards/homeworks-inline-keyboard";
+import { HomeworksKeyboard } from "../Keyboards/homeworks-keyboard";
 import Store from "../../store/store";
 import Backend from "../../backend/backend";
 import { parseAttachments, uploadAttachments } from "../../helpers/attachmentsHelper";
+import { HomeworkPayload } from "../../backend/models";
+
+const cacheTime = 60 * 5 * 1000; // 5 минут
+const cache = new Map<number, { homeworks: HomeworkPayload[], time: number }>();
+
+
+const getHomeworks = async (backend: Backend, class_id: number, page: number): Promise<HomeworkPayload[] | undefined> => {
+    const cached = cache.get(class_id);
+
+    if (cached && cached.time + cacheTime > Date.now()) {
+        return cached.homeworks;
+    }
+
+    const { homeworks, ...homeworksError } = await backend.getClassHomeworks({ class_id: class_id });
+
+    if (homeworksError.isError) {
+        return undefined;
+    }
+
+    cache.set(class_id, { homeworks: homeworks, time: Date.now() });
+
+    return homeworks;
+}
 
 export namespace SendSolutionScene {
     export const name: string = 'solution_scene';
@@ -11,36 +34,43 @@ export namespace SendSolutionScene {
         return new StepScene(name, {
             steps: [
                 async (context) => {
+                    const { class_id } = context.state;
+
+                    if (!class_id) {
+                        await context.send('Ошибка авторизации');
+                        return context.scene.leave();
+                    }
+
+                    const page = context?.messagePayload?.page || 0;
+
+                    const homeworks = await getHomeworks(backend, class_id, page);
+
+                    if (!homeworks) {
+                        await context.send('Ошибка получения дз');
+                        return context.scene.leave();
+                    }
+
+                    if (!homeworks.length) {
+                        await context.send('Нет доступных заданий');
+                        return context.scene.leave();
+                    }
+
                     if (context.scene.step.firstTime) {
-                        const { class_id } = context.state;
-                        const { homeworks, ...homeworksError } = await backend.getClassHomeworks({ class_id: class_id });
-                        if (homeworksError.isError) {
-                            await context.send('Ошибка получения ДЗ');
-                            return context.scene.leave();
-                        }
-
-                        if (!homeworks.length) {
-                            await context.send('Нет доступных заданий');
-                            return context.scene.leave();
-                        }
-
-                        const kb = HomeworksInlineKeyboard(homeworks);
-
-                        return context.send({
-                            message: 'Выбирете задание из списка',
-                            keyboard: kb,
-                        });
+                        await context.send('Пожалуйста, выберете задание');
                     }
-                    return context.scene.step.next();
-                },
 
-                async (context) => {
+                    const kb = HomeworksKeyboard(homeworks, page);
+
+                    await context.send({
+                        message: `Страница ${page + 1}`,
+                        keyboard: kb,
+                    });
+
                     const hw_id = context?.messagePayload?.homework_id;
-                    if (!hw_id) {
-                        return context.send('Пожалуйста, сначала выберете задание');
+                    if (hw_id) {
+                        context.scene.state.homework_id = hw_id;
+                        return context.scene.step.next();
                     }
-                    context.scene.state.homework_id = hw_id;
-                    return context.scene.step.next();
                 },
 
                 async (context) => {
@@ -49,7 +79,7 @@ export namespace SendSolutionScene {
                     }
 
                     const { homework_id } = context.scene.state;
-                    const {stundent_id} = context.state;
+                    const { stundent_id } = context.state;
                     if (!homework_id || !stundent_id) {
                         await context.send('Что-то пошло не так');
                         return context.scene.leave();
@@ -78,7 +108,7 @@ export namespace SendSolutionScene {
                         }
                     });
 
-                    if(sendError.isError){
+                    if (sendError.isError) {
                         await context.send('Ошибка отправки');
                         return context.scene.leave();
                     }
