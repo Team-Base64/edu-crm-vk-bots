@@ -45,6 +45,7 @@ export type GetHomeworksRequest = {
 }
 
 export type SendSolutionRequest = {
+    student_id : number;
     homework_id: number;
     solution: SolutionData;
 }

@@ -102,13 +102,11 @@ export default class VkSlaveBot extends VkBot {
 
         if (getHomeworksError.isError) {
             slaveBotLogger.warn(getHomeworksError.error, 'Get homeworks error');
-            this.sendMessageToClient(peerId, 'Не получилось загрузить домашние задния :с');
-            return;
+            return context.send('Не получилось загрузить домашние задния :с');
         }
 
         if (!homeworks.length) {
-            this.sendMessageToClient(peerId, 'Нет дз');
-            return;
+            return context.send('Нет дз');
         }
 
         const msg = 'Список дз:\n\n' + homeworks.map((hw, index) => {
@@ -118,7 +116,7 @@ export default class VkSlaveBot extends VkBot {
             `;
         }).join('');
 
-        this.sendMessageToClient(peerId, msg);
+        return context.send(msg);
     }
 
     private async authMiddleware(context: MessageContext<ContextDefaultState>, next: NextMiddleware) {
@@ -133,35 +131,42 @@ export default class VkSlaveBot extends VkBot {
 
         if (!chatData) {
             slaveBotLogger.debug({ peerId, group_id }, 'Vk user is not linked to bot');
-            await context.send("С этим ботом не связан ваш преподаватель", { peer_id: peerId });
-
-            return;
+            return context.send("С этим ботом не связан ваш преподаватель", { peer_id: peerId });
         }
 
-        context.state = {...context.state, ...chatData};
+        // Получить stundent_id; 
+        slaveBotLogger.debug({ peerId, group_id }, 'Check vk user is linked to student');
+
+        const stundent_id = await this.db.getStudentId(peerId);
+        if (!stundent_id) {
+            slaveBotLogger.debug({ peerId, group_id }, 'Vk user is not linked to student');
+            return context.send("Не удалось загрузить ваш профиль. повторите позднее", { peer_id: peerId });
+        }
+
+        context.state = { ...context.state, ...chatData, stundent_id };
         return next();
     }
 
-    private async messageMiddleware(context: MessageContext<ContextDefaultState>): Promise<boolean> {
-        console.log('message mw');
+    private async messageMiddleware(context: MessageContext<ContextDefaultState>, next: NextMiddleware) {
 
         if (context.state.isCommand) {
-            return false;
+            return next();
         }
+        console.log('message mw');
 
         const { peerId, $groupId, text, attachments } = context;
         const internal_chat_id: number = context.state.internal_chat_id;
 
         if (!internal_chat_id) {
             console.log('No chat_id ', context.state);
-            return false;
+            return next();
         }
 
         slaveBotLogger.debug({ peerId }, 'Get message ');
 
         if (!$groupId) {
             slaveBotLogger.warn('Group id in vk message is undefined ');
-            return false;
+            return next();
         }
 
 
@@ -169,7 +174,7 @@ export default class VkSlaveBot extends VkBot {
 
         let uploaded_attaches: string[] = [];
 
-        if(attachments) {
+        if (attachments) {
             const pasrsed = parseAttachments(attachments);
             uploaded_attaches = await uploadAttachments(pasrsed, this.backend);
         }
@@ -185,7 +190,7 @@ export default class VkSlaveBot extends VkBot {
 
         if (!isOk) {
             slaveBotLogger.warn('Sending msg to backend failed');
-            this.sendMessageToClient(peerId, 'Сообщение не доставлено');
+            return context.send('Сообщение не доставлено');
         }
 
         // Sending
@@ -194,6 +199,6 @@ export default class VkSlaveBot extends VkBot {
         // message: - текстовое сообщение
         // group_id: - id группы вк где бот - не обязательно!!!
 
-        return Promise.resolve(true);
+        return;
     }
 }

@@ -54,7 +54,8 @@ export namespace SendSolutionScene {
                     }
 
                     const { homework_id } = context.scene.state;
-                    if (!homework_id) {
+                    const {stundent_id} = context.state;
+                    if (!homework_id || !stundent_id) {
                         console.log('3: no hw id');
                         await context.send('Что-то пошло не так');
                         return context.scene.leave();
@@ -75,6 +76,7 @@ export namespace SendSolutionScene {
                     }
 
                     const { ...sendError } = await backend.sendHomeworkSolution({
+                        student_id: stundent_id,
                         homework_id: homework_id,
                         solution: {
                             text: text || '',

@@ -69,7 +69,7 @@ class BackendMock implements Backend {
         return { isError: true, error: 'Cant create student', student_id: 0 };
     }
     public async sendHomeworkSolution(payload: SendSolutionRequest): Promise<BackendError | SendSolutionResponse> {
-        const { homework_id, solution } = payload;
+        const { homework_id, solution, student_id } = payload;
         const { text, attachmentURLs } = solution;
         const id = await this.db_createSolution(text, attachmentURLs);
 
