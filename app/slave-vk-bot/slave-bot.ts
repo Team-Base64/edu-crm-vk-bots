@@ -13,6 +13,7 @@ import { customSceneMiddleware } from "../master-vk-bot/Scenes/custom-scene-midd
 import { SessionManager } from "@vk-io/session";
 import { SceneContext, SceneManager } from "@vk-io/scenes";
 import { SendSolutionScene } from "./Scenes/send-solution-scene";
+import { parseAttachments, uploadAttachments } from "../helpers/attachmentsHelper";
 
 const slaveBotLogger = logger.child({ class: 'SlaveVkBot' });
 
@@ -164,77 +165,14 @@ export default class VkSlaveBot extends VkBot {
         }
 
 
-
         // Работа с вложениями
 
-        const uploaded_attaches: string[] = [];
+        let uploaded_attaches: string[] = [];
 
-        // для каждого вложения
-        for (let attach of attachments) {
-            const attachJson = attach.toJSON() as any;
-
-            // Если документ
-            if (attach.type === AttachmentType.DOCUMENT) {
-                // url
-                const { url, extension }: { url: string, extension: string } = attachJson;
-
-                // mimetype
-                const mimetype = mime.getType(extension);
-                if (!mimetype) continue;
-
-                // Загружаем на бэк
-                const { internalFileURL, ...uploadFileError } =
-                    await this.backend.uploadFile({
-                        fileURL: changeHttpsToHttp(url),
-                        mimetype: mimetype
-                    });
-
-                if (uploadFileError.isError) {
-                    slaveBotLogger.warn(uploadFileError.error, 'Upload document error');
-                    continue;
-                }
-
-                // Сохраняем внутренний путь
-                uploaded_attaches.push(internalFileURL);
-                continue;
-            }
-
-            // Если фото
-            if (attach.type === AttachmentType.PHOTO) {
-                // Получаем url
-                const fullURL: string = attachJson.largeSizeUrl;
-                if (!fullURL) continue;
-
-                // mimetype
-                const mimetype = mime.getType(
-                    fullURL
-                        .slice(
-                            0,
-                            fullURL.indexOf('?')
-                        )
-                );
-
-                if (!mimetype) continue;
-
-                // Загружаем на бэк
-                const { internalFileURL, ...uploadFileError } =
-                    await this.backend.uploadFile({
-                        fileURL: changeHttpsToHttp(fullURL),
-                        mimetype: mimetype
-                    });
-
-                if (uploadFileError.isError) {
-                    slaveBotLogger.warn(uploadFileError.error, 'Upload photo error');
-                    continue;
-                }
-
-                // Сохраняем внутренний путь
-                uploaded_attaches.push(internalFileURL);
-                continue;
-            }
+        if(attachments) {
+            const pasrsed = parseAttachments(attachments);
+            uploaded_attaches = await uploadAttachments(pasrsed, this.backend);
         }
-
-
 
         // Собрать сообщение
         // Отправить сообщение на бэкэнд
