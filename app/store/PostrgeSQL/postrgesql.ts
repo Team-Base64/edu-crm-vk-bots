@@ -80,18 +80,19 @@ export class PostrgesStore implements Store {
             });
     }
 
-    public async getInternalChatId(peer_id: number, group_id: number): Promise<number | undefined> {
-        return this.db.query(`select internal_chat_id
+    public async getInternalChatId(peer_id: number, group_id: number): Promise<{class_id: number, internal_chat_id : number} | undefined> {
+        return this.db.query(`select internal_chat_id, class_id
                               from link_user_bot_chat
                               where vk_group_id = $1
                                 and vk_user_id = $2;`,
             [group_id, peer_id])
             .then(data => {
-                if (!data.rows[0].internal_chat_id) {
+                if (!data.rows[0]) {
                     return undefined;
                 }
                 const internal_chat_id = data.rows[0].internal_chat_id;
-                return internal_chat_id;
+                const class_id = data.rows[0].class_id;
+                return {internal_chat_id : internal_chat_id, class_id : class_id};
             })
             .catch(e => {
                 posrgresLogger.error(e, 'Postrges get internal_chat_id error');
@@ -99,12 +100,12 @@ export class PostrgesStore implements Store {
             });
     }
 
-    public setInternalChatId(peer_id: number, group_id: number, internal_chat_id: number): Promise<boolean> {
+    public setInternalChatId(peer_id: number, group_id: number, internal_chat_id: number, class_id : number): Promise<boolean> {
         return this.db.query(`insert into link_user_bot_chat
-                                  (internal_chat_id, vk_group_id, vk_user_id)
-                              values ($1, $2, $3)
+                                  (internal_chat_id, vk_group_id, vk_user_id, class_id)
+                              values ($1, $2, $3, $4)
                               returning internal_chat_id;`,
-            [internal_chat_id, group_id, peer_id])
+            [internal_chat_id, group_id, peer_id, class_id])
             .then(data => {
                 if (data.rowCount < 1) {
                     return false;
