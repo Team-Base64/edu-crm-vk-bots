@@ -181,7 +181,7 @@ export class VkMasterBot extends VkBot {
 
         // Привязать бота к новому чату
         masterBotLogger.debug({ peer_id, group_id, internal_chat_id }, 'Linking vacant bot ');
-        const isOk = await this.db.setInternalChatId(peer_id, group_id, internal_chat_id);
+        const isOk = await this.db.setInternalChatId(peer_id, group_id, internal_chat_id, class_id);
 
         if (!isOk) {
             masterBotLogger.error({ peer_id, group_id, internal_chat_id }, 'Linking vacant bot error');

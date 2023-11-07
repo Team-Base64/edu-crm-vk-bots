@@ -42,6 +42,7 @@ class BackendMock implements Backend {
     public async getHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse> {
         const { class_id } = payload;
         const hws = await this.db_getHomeworks(class_id);
+        console.log('MOCK: getHws', class_id, hws);
 
         if (hws) {
             return { homeworks: hws };
@@ -73,8 +74,10 @@ class BackendMock implements Backend {
         const id = await this.db_createSolution(text, attachmentURLs);
 
         if (id) {
+            backendLogger.debug(id, 'MOCK solution отправлено');
             return {};
         }
+        backendLogger.error(id, 'MOCK solution ошибка отправки');
 
         return {
             isError: true,
