@@ -37,15 +37,15 @@ function deserialize_chat_CreateStudentRequest(buffer_arg) {
   return backend_GRPC$backend_grpc_proto_model_pb.CreateStudentRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_chat_CreateStudentRespose(arg) {
-  if (!(arg instanceof backend_GRPC$backend_grpc_proto_model_pb.CreateStudentRespose)) {
-    throw new Error('Expected argument of type chat.CreateStudentRespose');
+function serialize_chat_CreateStudentResponse(arg) {
+  if (!(arg instanceof backend_GRPC$backend_grpc_proto_model_pb.CreateStudentResponse)) {
+    throw new Error('Expected argument of type chat.CreateStudentResponse');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_chat_CreateStudentRespose(buffer_arg) {
-  return backend_GRPC$backend_grpc_proto_model_pb.CreateStudentRespose.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_chat_CreateStudentResponse(buffer_arg) {
+  return backend_GRPC$backend_grpc_proto_model_pb.CreateStudentResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_chat_FileUploadRequest(arg) {
@@ -209,11 +209,11 @@ var BotServiceService = exports.BotServiceService = {
     requestStream: false,
     responseStream: false,
     requestType: backend_GRPC$backend_grpc_proto_model_pb.CreateStudentRequest,
-    responseType: backend_GRPC$backend_grpc_proto_model_pb.CreateStudentRespose,
+    responseType: backend_GRPC$backend_grpc_proto_model_pb.CreateStudentResponse,
     requestSerialize: serialize_chat_CreateStudentRequest,
     requestDeserialize: deserialize_chat_CreateStudentRequest,
-    responseSerialize: serialize_chat_CreateStudentRespose,
-    responseDeserialize: deserialize_chat_CreateStudentRespose,
+    responseSerialize: serialize_chat_CreateStudentResponse,
+    responseDeserialize: deserialize_chat_CreateStudentResponse,
   },
   sendSolution: {
     path: '/chat.BotService/SendSolution',

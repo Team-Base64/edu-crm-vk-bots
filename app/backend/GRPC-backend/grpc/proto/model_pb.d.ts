@@ -187,6 +187,8 @@ export class SendSolutionRequest extends jspb.Message {
     clearSolution(): void;
     getSolution(): SolutionData | undefined;
     setSolution(value?: SolutionData): SendSolutionRequest;
+    getStudentid(): number;
+    setStudentid(value: number): SendSolutionRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): SendSolutionRequest.AsObject;
@@ -202,6 +204,7 @@ export namespace SendSolutionRequest {
     export type AsObject = {
         homeworkid: number,
         solution?: SolutionData.AsObject,
+        studentid: number,
     }
 }
 
@@ -248,21 +251,21 @@ export namespace ValidateTokenResponse {
     }
 }
 
-export class CreateStudentRespose extends jspb.Message { 
+export class CreateStudentResponse extends jspb.Message { 
     getStudentid(): number;
-    setStudentid(value: number): CreateStudentRespose;
+    setStudentid(value: number): CreateStudentResponse;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): CreateStudentRespose.AsObject;
-    static toObject(includeInstance: boolean, msg: CreateStudentRespose): CreateStudentRespose.AsObject;
+    toObject(includeInstance?: boolean): CreateStudentResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: CreateStudentResponse): CreateStudentResponse.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: CreateStudentRespose, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): CreateStudentRespose;
-    static deserializeBinaryFromReader(message: CreateStudentRespose, reader: jspb.BinaryReader): CreateStudentRespose;
+    static serializeBinaryToWriter(message: CreateStudentResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): CreateStudentResponse;
+    static deserializeBinaryFromReader(message: CreateStudentResponse, reader: jspb.BinaryReader): CreateStudentResponse;
 }
 
-export namespace CreateStudentRespose {
+export namespace CreateStudentResponse {
     export type AsObject = {
         studentid: number,
     }

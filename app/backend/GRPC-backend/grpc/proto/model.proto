@@ -48,6 +48,7 @@ message GetHomeworksRequest {
 message SendSolutionRequest {
     int32 homeworkID = 1;
     SolutionData solution = 2;
+    int32 studentID = 3;
 }
 
 message FileUploadRequest {
@@ -88,7 +89,7 @@ service BotService {
     rpc CreateChat (CreateChatRequest) returns (CreateChatResponse);
     rpc GetHomeworks (GetHomeworksRequest) returns (GetHomeworksResponse);
     rpc UploadFile (FileUploadRequest) returns (FileUploadResponse);
-    rpc CreateStudent(CreateStudentRequest) returns (CreateStudentRespose);
+    rpc CreateStudent(CreateStudentRequest) returns (CreateStudentResponse);
     rpc SendSolution (SendSolutionRequest) returns (SendSolutionResponse);
 }
 

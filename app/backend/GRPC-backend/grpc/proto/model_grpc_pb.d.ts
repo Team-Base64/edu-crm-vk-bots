@@ -62,14 +62,14 @@ interface IBotServiceService_IUploadFile extends grpc.MethodDefinition<model_pb.
     responseSerialize: grpc.serialize<model_pb.FileUploadResponse>;
     responseDeserialize: grpc.deserialize<model_pb.FileUploadResponse>;
 }
-interface IBotServiceService_ICreateStudent extends grpc.MethodDefinition<model_pb.CreateStudentRequest, model_pb.CreateStudentRespose> {
+interface IBotServiceService_ICreateStudent extends grpc.MethodDefinition<model_pb.CreateStudentRequest, model_pb.CreateStudentResponse> {
     path: "/chat.BotService/CreateStudent";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<model_pb.CreateStudentRequest>;
     requestDeserialize: grpc.deserialize<model_pb.CreateStudentRequest>;
-    responseSerialize: grpc.serialize<model_pb.CreateStudentRespose>;
-    responseDeserialize: grpc.deserialize<model_pb.CreateStudentRespose>;
+    responseSerialize: grpc.serialize<model_pb.CreateStudentResponse>;
+    responseDeserialize: grpc.deserialize<model_pb.CreateStudentResponse>;
 }
 interface IBotServiceService_ISendSolution extends grpc.MethodDefinition<model_pb.SendSolutionRequest, model_pb.SendSolutionResponse> {
     path: "/chat.BotService/SendSolution";
@@ -89,7 +89,7 @@ export interface IBotServiceServer extends grpc.UntypedServiceImplementation {
     createChat: grpc.handleUnaryCall<model_pb.CreateChatRequest, model_pb.CreateChatResponse>;
     getHomeworks: grpc.handleUnaryCall<model_pb.GetHomeworksRequest, model_pb.GetHomeworksResponse>;
     uploadFile: grpc.handleUnaryCall<model_pb.FileUploadRequest, model_pb.FileUploadResponse>;
-    createStudent: grpc.handleUnaryCall<model_pb.CreateStudentRequest, model_pb.CreateStudentRespose>;
+    createStudent: grpc.handleUnaryCall<model_pb.CreateStudentRequest, model_pb.CreateStudentResponse>;
     sendSolution: grpc.handleUnaryCall<model_pb.SendSolutionRequest, model_pb.SendSolutionResponse>;
 }
 
@@ -109,9 +109,9 @@ export interface IBotServiceClient {
     uploadFile(request: model_pb.FileUploadRequest, callback: (error: grpc.ServiceError | null, response: model_pb.FileUploadResponse) => void): grpc.ClientUnaryCall;
     uploadFile(request: model_pb.FileUploadRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.FileUploadResponse) => void): grpc.ClientUnaryCall;
     uploadFile(request: model_pb.FileUploadRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.FileUploadResponse) => void): grpc.ClientUnaryCall;
-    createStudent(request: model_pb.CreateStudentRequest, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentRespose) => void): grpc.ClientUnaryCall;
-    createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentRespose) => void): grpc.ClientUnaryCall;
-    createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentRespose) => void): grpc.ClientUnaryCall;
+    createStudent(request: model_pb.CreateStudentRequest, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
+    createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
+    createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
     sendSolution(request: model_pb.SendSolutionRequest, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
     sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
     sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
@@ -133,9 +133,9 @@ export class BotServiceClient extends grpc.Client implements IBotServiceClient {
     public uploadFile(request: model_pb.FileUploadRequest, callback: (error: grpc.ServiceError | null, response: model_pb.FileUploadResponse) => void): grpc.ClientUnaryCall;
     public uploadFile(request: model_pb.FileUploadRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.FileUploadResponse) => void): grpc.ClientUnaryCall;
     public uploadFile(request: model_pb.FileUploadRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.FileUploadResponse) => void): grpc.ClientUnaryCall;
-    public createStudent(request: model_pb.CreateStudentRequest, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentRespose) => void): grpc.ClientUnaryCall;
-    public createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentRespose) => void): grpc.ClientUnaryCall;
-    public createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentRespose) => void): grpc.ClientUnaryCall;
+    public createStudent(request: model_pb.CreateStudentRequest, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
+    public createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
+    public createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
     public sendSolution(request: model_pb.SendSolutionRequest, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
     public sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
     public sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
