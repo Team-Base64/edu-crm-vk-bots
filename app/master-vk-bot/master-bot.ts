@@ -115,7 +115,7 @@ export class VkMasterBot extends VkBot {
             // Регаем
             masterBotLogger.debug({ peer_id, first_name, last_name }, 'Registration of student');
 
-            const { isError, error, student_id } = await this.backend.createStudent({
+            const { isError, error, student_id } = await this.backend.createNewStudent({
                 name: [first_name, last_name].join(' '),
                 type: 'vk',
             });
@@ -165,7 +165,7 @@ export class VkMasterBot extends VkBot {
         // Есть свободные боты 
         // получить internal_chat_id (создать чат на бэке)
         masterBotLogger.debug('Creating chat');
-        const { internal_chat_id, ...createChatError } = await this.backend.createChat({ class_id: class_id, student_id: current_student_id });
+        const { internal_chat_id, ...createChatError } = await this.backend.createInternalChat({ class_id: class_id, student_id: current_student_id });
 
         if (createChatError.isError) {
             masterBotLogger.error('Creating chat error');

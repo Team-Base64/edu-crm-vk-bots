@@ -2,7 +2,7 @@ import { Client, ClientConfig } from "pg";
 import { gracefulStop } from "../../helpers/graceful-stop";
 import Backend from "../backend";
 import logger from "../../helpers/logger";
-import { ValidateTokenRequest, ValidateTokenResponse, BackendError, CreateChatRequest, CreateChatResponse, GetHomeworksRequest, GetHomeworksResponse, FileUploadRequest, FileUploadResponse, CreateStudentRequest, CreateStudentResponse, SendSolutionRequest, SendSolutionResponse, HomeworkData, ServerMessageToSlaveHandler, Message } from "../models";
+import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
 
 const backendLogger = logger.child({ class: 'MOCKbackend' });
 
@@ -16,7 +16,7 @@ class BackendMock implements Backend {
         gracefulStop(this.stop.bind(this));
     }
 
-    public async validateInviteToken(payload: ValidateTokenRequest): Promise<ValidateTokenResponse> {
+    public async validateInviteToken(payload: ValidateTokenPayload): Promise<ValidateTokenResult> {
         const { token } = payload;
 
         const class_id = await this.db_getToken(token);
@@ -29,7 +29,7 @@ class BackendMock implements Backend {
         return { isError: true, error: 'Validation token error', class_id: 0 };
     }
 
-    public async createInternalChat(payload: CreateChatRequest): Promise<CreateChatResponse> {
+    public async createInternalChat(payload: CreateChatPayload): Promise<CreateChatResult> {
         const { student_id, class_id } = payload;
         const chat_id = await this.db_createChat(student_id, class_id);
         if (chat_id) {
@@ -39,7 +39,7 @@ class BackendMock implements Backend {
         return { isError: true, error: 'Cant create chat', internal_chat_id : 0 };
     }
 
-    public async getClassHomeworks(payload: GetHomeworksRequest): Promise<GetHomeworksResponse> {
+    public async getClassHomeworks(payload: GetHomeworksPayload): Promise<GetHomeworksResult> {
         const { class_id } = payload;
         const hws = await this.db_getHomeworks(class_id);
         console.log('MOCK: getHws', class_id, hws);
@@ -52,7 +52,7 @@ class BackendMock implements Backend {
 
     }
 
-    public uploadAttachment(payload: FileUploadRequest): Promise<FileUploadResponse> {
+    public uploadAttachment(payload: FileUploadPayload): Promise<FileUploadResult> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 return resolve({ internalFileURL: payload.fileURL });
@@ -60,7 +60,7 @@ class BackendMock implements Backend {
         });
     }
 
-    public async createNewStudent(payload: CreateStudentRequest): Promise<CreateStudentResponse> {
+    public async createNewStudent(payload: CreateStudentPayload): Promise<CreateStudentResult> {
         const student_id = await this.db_createStudent(payload.name);
 
         if (student_id) {
@@ -68,7 +68,7 @@ class BackendMock implements Backend {
         }
         return { isError: true, error: 'Cant create student', student_id: 0 };
     }
-    public async sendHomeworkSolution(payload: SendSolutionRequest): Promise<BackendError | SendSolutionResponse> {
+    public async sendHomeworkSolution(payload: SendSolutionPayload): Promise<SendSolutionResult> {
         const { homework_id, solution, student_id } = payload;
         const { text, attachmentURLs } = solution;
         const id = await this.db_createSolution(text, attachmentURLs);
@@ -84,7 +84,7 @@ class BackendMock implements Backend {
             error: 'Cant send solution',
         };
     }
-    public resendFromServerToSlave(internal_chat_id: number, text: string): void {
+    public resendFromServerToSlave(payload : MessagePayload): void {
         throw new Error("Method not implemented.");
     }
 
@@ -153,7 +153,7 @@ class BackendMock implements Backend {
             });
     }
 
-    private async db_getHomeworks(class_id: number): Promise<HomeworkData[] | undefined> {
+    private async db_getHomeworks(class_id: number): Promise<HomeworkPayload[] | undefined> {
         return this.db.query(`select id, class_id, title, descr, attaches
                                 from homeworks
                                 where class_id = $1;`,
@@ -164,7 +164,7 @@ class BackendMock implements Backend {
                     return undefined;
                 }
 
-                const hws: HomeworkData[] = data.rows.map((row) => {
+                const hws: HomeworkPayload[] = data.rows.map((row) => {
                     const attaches: string[] = row.attaches.map((a: any) => String(a));
 
                     return {
@@ -220,7 +220,7 @@ class BackendMock implements Backend {
             });
     }
 
-    public resendMessageFromClient(payload : Message): Promise<boolean> {
+    public resendMessageFromClient(payload : MessagePayload): Promise<boolean> {
         const {internal_chat_id, text, attachmentURLs} = payload;
         backendLogger.info({ internal_chat_id, text, attachmentURLs }, 'MOCK-GRPC. Sending msg to sever ');
 

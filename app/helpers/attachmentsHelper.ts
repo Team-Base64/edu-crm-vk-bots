@@ -67,7 +67,7 @@ export const uploadAttachments = async (parsedAttachments: ParsedAttachment[], b
     for (let a of parsedAttachments) {
         // Загружаем на бэк
         const { internalFileURL, ...uploadFileError } =
-            await backend.uploadFile({
+            await backend.uploadAttachment({
                 fileURL: a.url,
                 mimetype: a.mimetype,
             });

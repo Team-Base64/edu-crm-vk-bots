@@ -1,7 +1,7 @@
 import { Keyboard } from "vk-io";
-import { HomeworkData } from "../../backend/models";
+import { HomeworkPayload } from "../../backend/models";
 
-export const HomeworksInlineKeyboard = (homeworks: HomeworkData[]) => {
+export const HomeworksInlineKeyboard = (homeworks: HomeworkPayload[]) => {
     const builder = Keyboard.keyboard(
         [
             homeworks.map(hw => {
@@ -16,5 +16,5 @@ export const HomeworksInlineKeyboard = (homeworks: HomeworkData[]) => {
         ]
     );
 
-    return builder.inline();
+    return builder.oneTime();
 }

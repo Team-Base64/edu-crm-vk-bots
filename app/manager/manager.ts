@@ -1,4 +1,5 @@
 import Backend from "../backend/backend";
+import { MessagePayload } from "../backend/models";
 import logger from "../helpers/logger";
 import { VkMasterBot } from "../master-vk-bot/master-bot";
 import VkSlaveBot from "../slave-vk-bot/slave-bot";
@@ -106,8 +107,9 @@ export default class VkBotsManager {
         }
     }
 
-    public async sendToSlave(internal_chat_id: number, text: string) {
+    public async sendToSlave(payload : MessagePayload) {
         const sendLogger = managerLogger.child({ func: 'SendToSlave' });
+        const {text, internal_chat_id, attachmentURLs} = payload;
 
         sendLogger.debug({ internal_chat_id }, 'Get bot data using internal chat_id');
         const data = await this.db.getTargetViaInternalChatId(internal_chat_id);

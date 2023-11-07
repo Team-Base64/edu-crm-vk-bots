@@ -11,7 +11,6 @@ export namespace SendSolutionScene {
         return new StepScene(name, {
             steps: [
                 async (context) => {
-                    // console.log('Step 1 fst time', context.scene.step.firstTime);
                     if (context.scene.step.firstTime) {
                         const { class_id } = context.state;
                         const { homeworks, ...homeworksError } = await backend.getClassHomeworks({ class_id: class_id });
@@ -28,7 +27,7 @@ export namespace SendSolutionScene {
                         const kb = HomeworksInlineKeyboard(homeworks);
 
                         return context.send({
-                            message: 'Выбирете задание:',
+                            message: 'Выбирете задание из списка',
                             keyboard: kb,
                         });
                     }
@@ -36,19 +35,15 @@ export namespace SendSolutionScene {
                 },
 
                 async (context) => {
-                    // console.log('Step 2 fst time', context.scene.step.firstTime);
                     const hw_id = context?.messagePayload?.homework_id;
                     if (!hw_id) {
-                        console.log('2: no hw_id');
-                        return;
+                        return context.send('Пожалуйста, сначала выберете задание');
                     }
-                    // console.log('2: hw ', hw_id);
                     context.scene.state.homework_id = hw_id;
                     return context.scene.step.next();
                 },
 
                 async (context) => {
-                    // console.log('Step 3 fst time', context.scene.step.firstTime);
                     if (context.scene.step.firstTime) {
                         return context.send('Отправьте решение');
                     }
@@ -56,7 +51,6 @@ export namespace SendSolutionScene {
                     const { homework_id } = context.scene.state;
                     const {stundent_id} = context.state;
                     if (!homework_id || !stundent_id) {
-                        console.log('3: no hw id');
                         await context.send('Что-то пошло не так');
                         return context.scene.leave();
                     }
@@ -85,7 +79,6 @@ export namespace SendSolutionScene {
                     });
 
                     if(sendError.isError){
-                        console.log('3: ', sendError.error);
                         await context.send('Ошибка отправки');
                         return context.scene.leave();
                     }
