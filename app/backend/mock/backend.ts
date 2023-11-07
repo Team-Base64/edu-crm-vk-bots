@@ -4,7 +4,9 @@ import Backend from "../backend";
 import logger from "../../helpers/logger";
 import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
 
-const backendLogger = logger.child({ class: 'MOCKbackend' });
+const backendLogger = logger.child({}, {
+    msgPrefix: 'MOCKbackend'
+});
 
 class BackendMock implements Backend {
     db: Client;
@@ -36,20 +38,18 @@ class BackendMock implements Backend {
             return { internal_chat_id: chat_id };
         }
 
-        return { isError: true, error: 'Cant create chat', internal_chat_id : 0 };
+        return { isError: true, error: 'Cant create chat', internal_chat_id: 0 };
     }
 
     public async getClassHomeworks(payload: GetHomeworksPayload): Promise<GetHomeworksResult> {
         const { class_id } = payload;
         const hws = await this.db_getHomeworks(class_id);
-        console.log('MOCK: getHws', class_id, hws);
 
         if (hws) {
             return { homeworks: hws };
         }
 
-        return { isError: true, error: 'Cant get homeworks', homeworks: []};
-
+        return { isError: true, error: 'Cant get homeworks', homeworks: [] };
     }
 
     public uploadAttachment(payload: FileUploadPayload): Promise<FileUploadResult> {
@@ -74,17 +74,17 @@ class BackendMock implements Backend {
         const id = await this.db_createSolution(text, attachmentURLs);
 
         if (id) {
-            backendLogger.debug({id}, 'MOCK solution отправлено');
+            backendLogger.debug({ id }, 'Solution отправлено');
             return {};
         }
-        backendLogger.error({id}, 'MOCK solution ошибка отправки');
+        backendLogger.error({ id }, 'Solution ошибка отправки');
 
         return {
             isError: true,
             error: 'Cant send solution',
         };
     }
-    public resendFromServerToSlave(payload : MessagePayload): void {
+    public resendFromServerToSlave(payload: MessagePayload): void {
         throw new Error("Method not implemented.");
     }
 
@@ -121,6 +121,7 @@ class BackendMock implements Backend {
         )
             .then(data => {
                 if (!data.rows) {
+                    backendLogger.warn('DB Solution not created');
                     return undefined;
                 }
 
@@ -128,7 +129,7 @@ class BackendMock implements Backend {
 
             })
             .catch(e => {
-                backendLogger.error(e, 'MOCK db create solution error');
+                backendLogger.error(e, 'DB Create solution error');
                 return undefined;
             });
     }
@@ -141,6 +142,7 @@ class BackendMock implements Backend {
         )
             .then(data => {
                 if (!data.rows) {
+                    backendLogger.warn('DB Stundet not created');
                     return undefined;
                 }
 
@@ -148,7 +150,7 @@ class BackendMock implements Backend {
 
             })
             .catch(e => {
-                backendLogger.error(e, 'MOCK db create student error');
+                backendLogger.error(e, 'DB create student error');
                 return undefined;
             });
     }
@@ -161,6 +163,7 @@ class BackendMock implements Backend {
         )
             .then(data => {
                 if (!data.rows) {
+                    backendLogger.warn('DB get hws err');
                     return undefined;
                 }
 
@@ -178,7 +181,7 @@ class BackendMock implements Backend {
                 return hws;
             })
             .catch(e => {
-                backendLogger.error(e, 'MOCK db get hws error');
+                backendLogger.error(e, 'DB get hws error');
                 return undefined;
             });
     }
@@ -220,8 +223,8 @@ class BackendMock implements Backend {
             });
     }
 
-    public resendMessageFromClient(payload : MessagePayload): Promise<boolean> {
-        const {internal_chat_id, text, attachmentURLs} = payload;
+    public resendMessageFromClient(payload: MessagePayload): Promise<boolean> {
+        const { internal_chat_id, text, attachmentURLs } = payload;
         backendLogger.info({ internal_chat_id, text, attachmentURLs }, 'MOCK-GRPC. Sending msg to sever ');
 
         return new Promise((resolve, reject) => {

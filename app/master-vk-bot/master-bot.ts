@@ -16,7 +16,9 @@ export interface InviteData {
     peer_id: number,
 }
 
-const masterBotLogger = logger.child({ class: 'VkMasterBot' });
+const masterBotLogger = logger.child({}, { 
+    msgPrefix: 'VkMasterBot: ' 
+});
 
 export class VkMasterBot extends VkBot {
 
@@ -143,6 +145,8 @@ export class VkMasterBot extends VkBot {
         }
 
         // ДА id > 0 или зарегали
+
+        // TODO привязан ли он к классу
 
         // Посмтреть есть ли свободные боты 
         masterBotLogger.debug({ peer_id, current_student_id }, 'Checking vacant bots for');

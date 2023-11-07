@@ -1,21 +1,20 @@
 import VkBot from "../vk-bot/vk-bot"
 import Store from "../store/store";
 import Backend from "../backend/backend";
-import { AttachmentType, ContextDefaultState, MessageContext, PhotoAttachment } from "vk-io";
+import { ContextDefaultState, MessageContext } from "vk-io";
 import logger from "../helpers/logger";
 import { NextMiddleware } from "middleware-io";
 
-import mime from 'mime';
-import { changeHttpsToHttp } from "../helpers/changeHttpsToHttp";
 import { CommandPatterns } from "./Commands/command-patterns";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
-import { customSceneMiddleware } from "../master-vk-bot/Scenes/custom-scene-middleware";
 import { SessionManager } from "@vk-io/session";
-import { SceneContext, SceneManager } from "@vk-io/scenes";
+import { SceneManager } from "@vk-io/scenes";
 import { SendSolutionScene } from "./Scenes/send-solution-scene";
 import { parseAttachments, uploadAttachments } from "../helpers/attachmentsHelper";
 
-const slaveBotLogger = logger.child({ class: 'SlaveVkBot' });
+const slaveBotLogger = logger.child({}, {
+    msgPrefix: 'SlaveVkBot: '
+});
 
 export default class VkSlaveBot extends VkBot {
     sessionManager: SessionManager;
@@ -48,7 +47,6 @@ export default class VkSlaveBot extends VkBot {
             {
                 command: CommandPatterns.Menu,
                 handler: (context) => {
-                    console.log('menu cmd');
                     context.send({
                         message: 'Главное меню',
                         keyboard: MainKeyboard,
@@ -80,17 +78,15 @@ export default class VkSlaveBot extends VkBot {
     }
 
     private async handleSendSolution(context: MessageContext) {
-        console.log('New solution cmd');
         context.scene.enter(SendSolutionScene.name);
     }
 
     private async handleGetHomeworks(context: MessageContext<ContextDefaultState>) {
-        console.log('homeworks');
-
         const { peerId } = context;
 
         const resp = await this.db.getInternalChatId(peerId, this.group_id);
         if (!resp) {
+            slaveBotLogger.warn({peerId}, 'Get internal chat id error');
             return;
         }
 
@@ -120,13 +116,11 @@ export default class VkSlaveBot extends VkBot {
     }
 
     private async authMiddleware(context: MessageContext<ContextDefaultState>, next: NextMiddleware) {
-        console.log('auth');
         const { peerId } = context;
         const { group_id } = this;
+
         // Проверить что пользователь привязан к боту и чату в crm 
         // Получить из базы chat_id 
-
-        slaveBotLogger.debug({ peerId, group_id }, 'Check vk user is linked to bot');
         const chatData = await this.db.getInternalChatId(peerId, group_id);
 
         if (!chatData) {
@@ -135,9 +129,8 @@ export default class VkSlaveBot extends VkBot {
         }
 
         // Получить stundent_id; 
-        slaveBotLogger.debug({ peerId, group_id }, 'Check vk user is linked to student');
-
         const stundent_id = await this.db.getStudentId(peerId);
+
         if (!stundent_id) {
             slaveBotLogger.debug({ peerId, group_id }, 'Vk user is not linked to student');
             return context.send("Не удалось загрузить ваш профиль. повторите позднее", { peer_id: peerId });
@@ -152,26 +145,20 @@ export default class VkSlaveBot extends VkBot {
         if (context.state.isCommand) {
             return next();
         }
-        console.log('message mw');
 
         const { peerId, $groupId, text, attachments } = context;
         const internal_chat_id: number = context.state.internal_chat_id;
 
         if (!internal_chat_id) {
-            console.log('No chat_id ', context.state);
             return next();
         }
-
-        slaveBotLogger.debug({ peerId }, 'Get message ');
 
         if (!$groupId) {
             slaveBotLogger.warn('Group id in vk message is undefined ');
             return next();
         }
 
-
         // Работа с вложениями
-
         let uploaded_attaches: string[] = [];
 
         if (attachments) {
@@ -181,7 +168,6 @@ export default class VkSlaveBot extends VkBot {
 
         // Собрать сообщение
         // Отправить сообщение на бэкэнд
-        slaveBotLogger.debug('Sending msg to backend');
         const isOk = await this.backend.resendMessageFromClient({
             internal_chat_id: internal_chat_id,
             text: text || '',
@@ -192,13 +178,5 @@ export default class VkSlaveBot extends VkBot {
             slaveBotLogger.warn('Sending msg to backend failed');
             return context.send('Сообщение не доставлено');
         }
-
-        // Sending
-        // random_id: - рандомное число, Date.now() + smth
-        // peer_id:  vk_id получателя
-        // message: - текстовое сообщение
-        // group_id: - id группы вк где бот - не обязательно!!!
-
-        return;
     }
 }

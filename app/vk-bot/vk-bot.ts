@@ -6,7 +6,9 @@ import { gracefulStop } from "../helpers/graceful-stop";
 import Backend from "../backend/backend";
 import logger from "../helpers/logger";
 
-const vkBotLogger = logger.child({ class: 'VkBot' });
+const vkBotLogger = logger.child({}, {
+    msgPrefix: 'VkBotShared: ',
+});
 
 interface CommandMiddleware {
     command: string | RegExp;
