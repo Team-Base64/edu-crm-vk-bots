@@ -1,19 +1,13 @@
 import { Keyboard } from "vk-io";
 import { HomeworkPayload } from "../../backend/models";
+import { paginate } from "../../helpers/pagination";
 
 const hwsOnPage = 4;
 
 export const HomeworksKeyboard = (homeworks: HomeworkPayload[], page: number) => {
-    let pages = Math.floor(homeworks.length / hwsOnPage);
-    if (pages * hwsOnPage < homeworks.length) pages++;
+    const { data, isFirstPage, isLastPage } = paginate(homeworks, page, hwsOnPage);
 
-    const hasPrev = page > 0;
-    const hasNext = page < pages - 1;
-
-    const from = hwsOnPage * page;
-    const to = Math.min(hwsOnPage * (page + 1), homeworks.length);
-
-    const content = homeworks.slice(from, to).map(hw => {
+    const content = data.map(hw => {
         return Keyboard.textButton({
             label: hw.title,
             payload: {
@@ -23,21 +17,31 @@ export const HomeworksKeyboard = (homeworks: HomeworkPayload[], page: number) =>
         });
     });
 
-    const prev = hasPrev ? [Keyboard.textButton({
-        label: 'Предудущая',
-        payload: {
-            page: page - 1,
-        },
-        color: 'secondary',
-    })] : [];
+    const prev = isFirstPage ?
+        []
+        :
+        [
+            Keyboard.textButton({
+                label: 'Предудущая',
+                payload: {
+                    page: page - 1,
+                },
+                color: 'secondary',
+            })
+        ];
 
-    const next = hasNext ? [Keyboard.textButton({
-        label: 'Следующая',
-        payload: {
-            page: page + 1,
-        },
-        color: 'secondary',
-    })] : [];
+    const next = isLastPage ?
+        []
+        :
+        [
+            Keyboard.textButton({
+                label: 'Следующая',
+                payload: {
+                    page: page + 1,
+                },
+                color: 'secondary',
+            })
+        ];
 
     const builder = Keyboard.keyboard(
         [
