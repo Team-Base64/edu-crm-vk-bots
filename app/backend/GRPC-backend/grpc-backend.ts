@@ -119,7 +119,9 @@ export default class GRPCBackend implements Backend {
                             attachmentURLs: hw.getAttachmenturlsList(),
                         };
                     });
-                return({ homeworks: homeworks });
+                backendLogger.debug({ homeworks }, 'Backend get homeworks done');
+
+                return ({ homeworks: homeworks });
             });
         });
     }
