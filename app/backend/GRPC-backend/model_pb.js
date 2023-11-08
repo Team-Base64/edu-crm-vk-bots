@@ -1,4 +1,4 @@
-// source: backend/GRPC-backend/grpc/proto/model.proto
+// source: model.proto
 /**
  * @fileoverview
  * @enhanceable

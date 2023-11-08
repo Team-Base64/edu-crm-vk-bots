@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node index.ts",
-    "protogen": "sh build.sh"
+    "start:deploy": "tsc && node build",
+    "start": "ts-node index.ts"
   },
   "author": "George Illarionov",
   "license": "ISC",
@@ -20,7 +20,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.9.7",
+    "@grpc/grpc-js": "^1.9.9",
     "@types/mime": "^3.0.3",
     "@vk-io/scenes": "^1.2.1",
     "@vk-io/session": "^2.2.1",

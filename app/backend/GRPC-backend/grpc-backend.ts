@@ -1,9 +1,9 @@
 import Backend from "../backend";
-import grpcOptions from "./config";
+// import grpcOptions from "./config";
 import logger from "../../helpers/logger";
-import { BotServiceClient } from "./grpc/proto/model_grpc_pb";
+import { BotServiceClient } from "./model_grpc_pb";
 import grpc from "@grpc/grpc-js";
-import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as GRPCMessage, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./grpc/proto/model_pb";
+import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as GRPCMessage, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
 import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
 
 const streamReconnectTimeout = 3;
@@ -15,16 +15,15 @@ export default class GRPCBackend implements Backend {
     private stream: grpc.ClientDuplexStream<GRPCMessage, GRPCMessage> | null;
     private toSlaveHandlers: ServerMessageToSlaveHandler[];
 
-    constructor(grpc: grpcOptions) {
-        const { address, credentials, options } = grpc
-        this.client = new BotServiceClient(address, credentials, options);
+    constructor() {
+        this.client = new BotServiceClient('127.0.0.1:8082', grpc.credentials.createInsecure());
         this.toSlaveHandlers = [];
         this.stream = null;
         //this.streamConnent();
     }
 
     private streamConnent() {
-        this.stream = this.client.startChatVK(); // TODO errors
+        this.stream = this.client.startChatVK({}); // TODO errors
         this.stream.on('data', this.streamDataHandler.bind(this));
         this.stream.on('end', this.streamEndHandler.bind(this));
         this.stream.on('error', this.streamErrorHandler.bind(this));
