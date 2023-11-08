@@ -105,5 +105,7 @@ export const uploadAttachments = async (parsedAttachments: ParsedAttachment[], b
         internal_urls.push(internalFileURL);
     }
 
+    parserLogger.debug({internal_urls}, 'Загрузка закончена');
+
     return internal_urls;
 }
