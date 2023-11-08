@@ -103,11 +103,11 @@ export default class GRPCBackend implements Backend {
         const req = new GetHomeworksRequest();
         req.setClassid(class_id);
 
-        return new Promise((resolve) => {
+        return new Promise(() => {
             this.client.getHomeworks(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend get homeworks error');
-                    resolve({ homeworks: [], isError: true, error: err.message });
+                    return ({ homeworks: [], isError: true, error: err.message });
                 }
                 const homeworks: HomeworkPayload[] = resp
                     .getHomeworksList()
@@ -119,7 +119,7 @@ export default class GRPCBackend implements Backend {
                             attachmentURLs: hw.getAttachmenturlsList(),
                         };
                     });
-                resolve({ homeworks: homeworks });
+                return({ homeworks: homeworks });
             });
         });
     }
