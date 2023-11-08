@@ -65,14 +65,14 @@ export default class GRPCBackend implements Backend {
         const req = new ValidateTokenRequest();
         req.setToken(token);
 
-        return new Promise(() => {
+        return new Promise((resolve) => {
             this.client.validateToken(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend validae token error');
-                    return ({ class_id: 0, isError: true, error: err.message });
+                    return resolve({ class_id: 0, isError: true, error: err.message });
                 }
 
-                return ({ class_id: resp.getClassid() });
+                return resolve({ class_id: resp.getClassid() });
             });
         });
     }
@@ -85,13 +85,13 @@ export default class GRPCBackend implements Backend {
         req.setClassid(class_id);
         req.setStudentid(student_id);
 
-        return new Promise(() => {
+        return new Promise((resolve) => {
             this.client.createChat(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend create chat error');
-                    return ({ internal_chat_id: 0, isError: true, error: err.message });
+                    return resolve({ internal_chat_id: 0, isError: true, error: err.message });
                 }
-                return ({ internal_chat_id: resp.getInternalchatid() });
+                return resolve({ internal_chat_id: resp.getInternalchatid() });
             });
         });
     }
@@ -134,14 +134,14 @@ export default class GRPCBackend implements Backend {
         req.setFileurl(fileURL);
         req.setMimetype(mimetype);
 
-        return new Promise(() => {
+        return new Promise((resolve) => {
             this.client.uploadFile(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend upload file error');
-                    return ({ internalFileURL: '', isError: true, error: err.message });
+                    return resolve({ internalFileURL: '', isError: true, error: err.message });
                 }
 
-                return ({ internalFileURL: resp.getInternalfileurl() });
+                return resolve({ internalFileURL: resp.getInternalfileurl() });
             });
         });
     }
@@ -155,14 +155,14 @@ export default class GRPCBackend implements Backend {
         req.setType(type);
         req.setAvatarurl(''); // TODO
 
-        return new Promise(() => {
+        return new Promise((resolve) => {
             this.client.createStudent(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend create student error');
-                    return ({ student_id: 0, isError: true, error: err.message });
+                    return resolve({ student_id: 0, isError: true, error: err.message });
                 }
 
-                return ({ student_id: resp.getStudentid() });
+                return resolve({ student_id: resp.getStudentid() });
             });
         });
     }
@@ -182,14 +182,14 @@ export default class GRPCBackend implements Backend {
         req.setHomeworkid(homework_id);
         req.setSolution(grpcSolution);
 
-        return new Promise(() => {
+        return new Promise((resolve) => {
             this.client.sendSolution(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend send solution error');
-                    return ({ isError: true, error: err.message });
+                    return resolve({ isError: true, error: err.message });
                 }
 
-                return ({});
+                return resolve({});
             });
         });
     }
@@ -203,20 +203,20 @@ export default class GRPCBackend implements Backend {
         req.setText(text);
         req.setAttachmenturlsList(attachmentURLs);
 
-        return new Promise(() => {
+        return new Promise((resolve) => {
             if (!this.stream) {
                 backendLogger.error('Backend Cant send msg to server. stream is null');
-                return false;
+                return resolve(false);
             }
 
             this.stream.write(req, (err: any) => {
                 if (err) {
                     backendLogger.warn({ payload, err }, 'Backend message sent GRPC error');
-                    return false;
+                    return resolve(false);
                 }
 
                 backendLogger.debug({ payload }, 'Message sent');
-                return true;
+                return resolve(true);
             });
         });
     }
