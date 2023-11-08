@@ -8,7 +8,7 @@ const hwsOnPage = 4;
 export const HomeworksKeyboard = (homeworks: HomeworkPayload[], page: number) => {
     logger.debug('Keyboard builder');
     const { data, isFirstPage, isLastPage } = paginate(homeworks, page, hwsOnPage);
-
+    logger.debug({data, isFirstPage, isLastPage});
     const prev = isFirstPage ?
         []
         :
