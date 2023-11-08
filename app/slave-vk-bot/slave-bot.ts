@@ -166,6 +166,8 @@ export default class VkSlaveBot extends VkBot {
             uploaded_attaches = await uploadAttachments(pasrsed, this.backend);
         }
 
+
+        slaveBotLogger.debug({uploaded_attaches}, 'Upload attachments in message');
         // Собрать сообщение
         // Отправить сообщение на бэкэнд
         const isOk = await this.backend.resendMessageFromClient({
