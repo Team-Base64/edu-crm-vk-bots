@@ -35,6 +35,7 @@ export const parseAttachments = (attachments: (Attachment<{}, string> | External
                     parserLogger.debug({ extension }, 'Не удалось получить mimetype');
                     break;
                 }
+                parserLogger.debug({mimetype}, 'Получил документ');
 
                 parsedAttachments.push({
                     url: changeHttpsToHttp(url),
@@ -66,6 +67,7 @@ export const parseAttachments = (attachments: (Attachment<{}, string> | External
                     break;
                 }
 
+                parserLogger.debug({mimetype}, 'Получил фотографию');
                 parsedAttachments.push({
                     url: changeHttpsToHttp(fullURL),
                     mimetype: mimetype,
