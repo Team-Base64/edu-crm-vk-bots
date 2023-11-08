@@ -126,10 +126,11 @@ export default class GRPCBackend implements Backend {
 
     public async uploadAttachment(payload: FileUploadPayload): Promise<FileUploadResult> {
         backendLogger.debug(payload, 'Backend start upload attachment');
-        const { fileURL } = payload;
+        const { fileURL, mimetype } = payload;
 
         const req = new FileUploadRequest();
         req.setFileurl(fileURL);
+        req.setMimetype(mimetype);
 
         return new Promise(() => {
             this.client.uploadFile(req, (err, resp) => {
