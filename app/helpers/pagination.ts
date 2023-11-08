@@ -1,8 +1,11 @@
+import logger from "./logger";
+
 export const paginate = (data: any[], page: number, els_on_page : number) : {
     data : any[],
     isFirstPage : boolean,
     isLastPage : boolean,
 } => {
+    logger.debug('Keyboard builder');
 
     let pages = Math.floor(data.length / els_on_page);
     if (pages * els_on_page < data.length) pages++;
