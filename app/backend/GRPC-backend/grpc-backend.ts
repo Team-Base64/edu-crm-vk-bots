@@ -65,14 +65,14 @@ export default class GRPCBackend implements Backend {
         const req = new ValidateTokenRequest();
         req.setToken(token);
 
-        return new Promise((resolve) => {
+        return new Promise(() => {
             this.client.validateToken(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend validae token error');
-                    return resolve({ class_id: 0, isError: true, error: err.message });
+                    return ({ class_id: 0, isError: true, error: err.message });
                 }
 
-                return resolve({ class_id: resp.getClassid() });
+                return ({ class_id: resp.getClassid() });
             });
         });
     }
@@ -85,13 +85,13 @@ export default class GRPCBackend implements Backend {
         req.setClassid(class_id);
         req.setStudentid(student_id);
 
-        return new Promise((resolve) => {
+        return new Promise(() => {
             this.client.createChat(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend create chat error');
-                    resolve({ internal_chat_id: 0, isError: true, error: err.message });
+                    return ({ internal_chat_id: 0, isError: true, error: err.message });
                 }
-                resolve({ internal_chat_id: resp.getInternalchatid() });
+                return ({ internal_chat_id: resp.getInternalchatid() });
             });
         });
     }
@@ -131,14 +131,14 @@ export default class GRPCBackend implements Backend {
         const req = new FileUploadRequest();
         req.setFileurl(fileURL);
 
-        return new Promise((resolve) => {
+        return new Promise(() => {
             this.client.uploadFile(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend upload file error');
-                    resolve({ internalFileURL: '', isError: true, error: err.message });
+                    return ({ internalFileURL: '', isError: true, error: err.message });
                 }
 
-                resolve({ internalFileURL: resp.getInternalfileurl() });
+                return ({ internalFileURL: resp.getInternalfileurl() });
             });
         });
     }
@@ -152,14 +152,14 @@ export default class GRPCBackend implements Backend {
         req.setType(type);
         req.setAvatarurl(''); // TODO
 
-        return new Promise((resolve) => {
+        return new Promise(() => {
             this.client.createStudent(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend create student error');
-                    resolve({ student_id: 0, isError: true, error: err.message });
+                    return ({ student_id: 0, isError: true, error: err.message });
                 }
 
-                resolve({ student_id: resp.getStudentid() });
+                return ({ student_id: resp.getStudentid() });
             });
         });
     }
@@ -179,14 +179,14 @@ export default class GRPCBackend implements Backend {
         req.setHomeworkid(homework_id);
         req.setSolution(grpcSolution);
 
-        return new Promise((resolve) => {
+        return new Promise(() => {
             this.client.sendSolution(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend send solution error');
-                    resolve({ isError: true, error: err.message });
+                    return ({ isError: true, error: err.message });
                 }
 
-                resolve({});
+                return ({});
             });
         });
     }
