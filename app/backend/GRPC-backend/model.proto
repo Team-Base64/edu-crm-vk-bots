@@ -82,7 +82,7 @@ message FileUploadResponse {
     string internalFileURL = 1;
 }
 
-service BotService { 
+service BotChat { 
     rpc StartChatVK(stream Message) returns (stream Message);
 
     rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);

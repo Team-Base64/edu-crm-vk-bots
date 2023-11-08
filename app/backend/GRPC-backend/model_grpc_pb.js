@@ -148,9 +148,9 @@ function deserialize_chat_ValidateTokenResponse(buffer_arg) {
 }
 
 
-var BotServiceService = exports.BotServiceService = {
+var BotChatService = exports.BotChatService = {
   startChatVK: {
-    path: '/chat.BotService/StartChatVK',
+    path: '/chat.BotChat/StartChatVK',
     requestStream: true,
     responseStream: true,
     requestType: model_pb.Message,
@@ -161,7 +161,7 @@ var BotServiceService = exports.BotServiceService = {
     responseDeserialize: deserialize_chat_Message,
   },
   validateToken: {
-    path: '/chat.BotService/ValidateToken',
+    path: '/chat.BotChat/ValidateToken',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.ValidateTokenRequest,
@@ -172,7 +172,7 @@ var BotServiceService = exports.BotServiceService = {
     responseDeserialize: deserialize_chat_ValidateTokenResponse,
   },
   createChat: {
-    path: '/chat.BotService/CreateChat',
+    path: '/chat.BotChat/CreateChat',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.CreateChatRequest,
@@ -183,7 +183,7 @@ var BotServiceService = exports.BotServiceService = {
     responseDeserialize: deserialize_chat_CreateChatResponse,
   },
   getHomeworks: {
-    path: '/chat.BotService/GetHomeworks',
+    path: '/chat.BotChat/GetHomeworks',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.GetHomeworksRequest,
@@ -194,7 +194,7 @@ var BotServiceService = exports.BotServiceService = {
     responseDeserialize: deserialize_chat_GetHomeworksResponse,
   },
   uploadFile: {
-    path: '/chat.BotService/UploadFile',
+    path: '/chat.BotChat/UploadFile',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.FileUploadRequest,
@@ -205,7 +205,7 @@ var BotServiceService = exports.BotServiceService = {
     responseDeserialize: deserialize_chat_FileUploadResponse,
   },
   createStudent: {
-    path: '/chat.BotService/CreateStudent',
+    path: '/chat.BotChat/CreateStudent',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.CreateStudentRequest,
@@ -216,7 +216,7 @@ var BotServiceService = exports.BotServiceService = {
     responseDeserialize: deserialize_chat_CreateStudentResponse,
   },
   sendSolution: {
-    path: '/chat.BotService/SendSolution',
+    path: '/chat.BotChat/SendSolution',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.SendSolutionRequest,
@@ -228,4 +228,4 @@ var BotServiceService = exports.BotServiceService = {
   },
 };
 
-exports.BotServiceClient = grpc.makeGenericClientConstructor(BotServiceService);
+exports.BotChatClient = grpc.makeGenericClientConstructor(BotChatService);

@@ -7,18 +7,18 @@
 import * as grpc from "@grpc/grpc-js";
 import * as model_pb from "./model_pb";
 
-interface IBotServiceService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
-    startChatVK: IBotServiceService_IStartChatVK;
-    validateToken: IBotServiceService_IValidateToken;
-    createChat: IBotServiceService_ICreateChat;
-    getHomeworks: IBotServiceService_IGetHomeworks;
-    uploadFile: IBotServiceService_IUploadFile;
-    createStudent: IBotServiceService_ICreateStudent;
-    sendSolution: IBotServiceService_ISendSolution;
+interface IBotChatService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
+    startChatVK: IBotChatService_IStartChatVK;
+    validateToken: IBotChatService_IValidateToken;
+    createChat: IBotChatService_ICreateChat;
+    getHomeworks: IBotChatService_IGetHomeworks;
+    uploadFile: IBotChatService_IUploadFile;
+    createStudent: IBotChatService_ICreateStudent;
+    sendSolution: IBotChatService_ISendSolution;
 }
 
-interface IBotServiceService_IStartChatVK extends grpc.MethodDefinition<model_pb.Message, model_pb.Message> {
-    path: "/chat.BotService/StartChatVK";
+interface IBotChatService_IStartChatVK extends grpc.MethodDefinition<model_pb.Message, model_pb.Message> {
+    path: "/chat.BotChat/StartChatVK";
     requestStream: true;
     responseStream: true;
     requestSerialize: grpc.serialize<model_pb.Message>;
@@ -26,8 +26,8 @@ interface IBotServiceService_IStartChatVK extends grpc.MethodDefinition<model_pb
     responseSerialize: grpc.serialize<model_pb.Message>;
     responseDeserialize: grpc.deserialize<model_pb.Message>;
 }
-interface IBotServiceService_IValidateToken extends grpc.MethodDefinition<model_pb.ValidateTokenRequest, model_pb.ValidateTokenResponse> {
-    path: "/chat.BotService/ValidateToken";
+interface IBotChatService_IValidateToken extends grpc.MethodDefinition<model_pb.ValidateTokenRequest, model_pb.ValidateTokenResponse> {
+    path: "/chat.BotChat/ValidateToken";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<model_pb.ValidateTokenRequest>;
@@ -35,8 +35,8 @@ interface IBotServiceService_IValidateToken extends grpc.MethodDefinition<model_
     responseSerialize: grpc.serialize<model_pb.ValidateTokenResponse>;
     responseDeserialize: grpc.deserialize<model_pb.ValidateTokenResponse>;
 }
-interface IBotServiceService_ICreateChat extends grpc.MethodDefinition<model_pb.CreateChatRequest, model_pb.CreateChatResponse> {
-    path: "/chat.BotService/CreateChat";
+interface IBotChatService_ICreateChat extends grpc.MethodDefinition<model_pb.CreateChatRequest, model_pb.CreateChatResponse> {
+    path: "/chat.BotChat/CreateChat";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<model_pb.CreateChatRequest>;
@@ -44,8 +44,8 @@ interface IBotServiceService_ICreateChat extends grpc.MethodDefinition<model_pb.
     responseSerialize: grpc.serialize<model_pb.CreateChatResponse>;
     responseDeserialize: grpc.deserialize<model_pb.CreateChatResponse>;
 }
-interface IBotServiceService_IGetHomeworks extends grpc.MethodDefinition<model_pb.GetHomeworksRequest, model_pb.GetHomeworksResponse> {
-    path: "/chat.BotService/GetHomeworks";
+interface IBotChatService_IGetHomeworks extends grpc.MethodDefinition<model_pb.GetHomeworksRequest, model_pb.GetHomeworksResponse> {
+    path: "/chat.BotChat/GetHomeworks";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<model_pb.GetHomeworksRequest>;
@@ -53,8 +53,8 @@ interface IBotServiceService_IGetHomeworks extends grpc.MethodDefinition<model_p
     responseSerialize: grpc.serialize<model_pb.GetHomeworksResponse>;
     responseDeserialize: grpc.deserialize<model_pb.GetHomeworksResponse>;
 }
-interface IBotServiceService_IUploadFile extends grpc.MethodDefinition<model_pb.FileUploadRequest, model_pb.FileUploadResponse> {
-    path: "/chat.BotService/UploadFile";
+interface IBotChatService_IUploadFile extends grpc.MethodDefinition<model_pb.FileUploadRequest, model_pb.FileUploadResponse> {
+    path: "/chat.BotChat/UploadFile";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<model_pb.FileUploadRequest>;
@@ -62,8 +62,8 @@ interface IBotServiceService_IUploadFile extends grpc.MethodDefinition<model_pb.
     responseSerialize: grpc.serialize<model_pb.FileUploadResponse>;
     responseDeserialize: grpc.deserialize<model_pb.FileUploadResponse>;
 }
-interface IBotServiceService_ICreateStudent extends grpc.MethodDefinition<model_pb.CreateStudentRequest, model_pb.CreateStudentResponse> {
-    path: "/chat.BotService/CreateStudent";
+interface IBotChatService_ICreateStudent extends grpc.MethodDefinition<model_pb.CreateStudentRequest, model_pb.CreateStudentResponse> {
+    path: "/chat.BotChat/CreateStudent";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<model_pb.CreateStudentRequest>;
@@ -71,8 +71,8 @@ interface IBotServiceService_ICreateStudent extends grpc.MethodDefinition<model_
     responseSerialize: grpc.serialize<model_pb.CreateStudentResponse>;
     responseDeserialize: grpc.deserialize<model_pb.CreateStudentResponse>;
 }
-interface IBotServiceService_ISendSolution extends grpc.MethodDefinition<model_pb.SendSolutionRequest, model_pb.SendSolutionResponse> {
-    path: "/chat.BotService/SendSolution";
+interface IBotChatService_ISendSolution extends grpc.MethodDefinition<model_pb.SendSolutionRequest, model_pb.SendSolutionResponse> {
+    path: "/chat.BotChat/SendSolution";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<model_pb.SendSolutionRequest>;
@@ -81,9 +81,9 @@ interface IBotServiceService_ISendSolution extends grpc.MethodDefinition<model_p
     responseDeserialize: grpc.deserialize<model_pb.SendSolutionResponse>;
 }
 
-export const BotServiceService: IBotServiceService;
+export const BotChatService: IBotChatService;
 
-export interface IBotServiceServer extends grpc.UntypedServiceImplementation {
+export interface IBotChatServer extends grpc.UntypedServiceImplementation {
     startChatVK: grpc.handleBidiStreamingCall<model_pb.Message, model_pb.Message>;
     validateToken: grpc.handleUnaryCall<model_pb.ValidateTokenRequest, model_pb.ValidateTokenResponse>;
     createChat: grpc.handleUnaryCall<model_pb.CreateChatRequest, model_pb.CreateChatResponse>;
@@ -93,7 +93,7 @@ export interface IBotServiceServer extends grpc.UntypedServiceImplementation {
     sendSolution: grpc.handleUnaryCall<model_pb.SendSolutionRequest, model_pb.SendSolutionResponse>;
 }
 
-export interface IBotServiceClient {
+export interface IBotChatClient {
     startChatVK(): grpc.ClientDuplexStream<model_pb.Message, model_pb.Message>;
     startChatVK(options: Partial<grpc.CallOptions>): grpc.ClientDuplexStream<model_pb.Message, model_pb.Message>;
     startChatVK(metadata: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientDuplexStream<model_pb.Message, model_pb.Message>;
@@ -117,7 +117,7 @@ export interface IBotServiceClient {
     sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
 }
 
-export class BotServiceClient extends grpc.Client implements IBotServiceClient {
+export class BotChatClient extends grpc.Client implements IBotChatClient {
     constructor(address: string, credentials: grpc.ChannelCredentials, options?: Partial<grpc.ClientOptions>);
     public startChatVK(options?: Partial<grpc.CallOptions>): grpc.ClientDuplexStream<model_pb.Message, model_pb.Message>;
     public startChatVK(metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientDuplexStream<model_pb.Message, model_pb.Message>;
