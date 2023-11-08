@@ -54,6 +54,30 @@ values (1, 'HW 1', 'descr 1', '{}');
 insert into homeworks(class_id, title, descr, attaches)
 values (1, 'HW 2', 'descr 2', '{}');
 
+insert into homeworks(class_id, title, descr, attaches)
+values (1, 'HW 3', 'descr 2', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (1, 'HW 4', 'descr 2', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (1, 'HW 5', 'descr 2', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (1, 'HW 6', 'descr 2', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (1, 'HW 7', 'descr 2', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (1, 'HW 8', 'descr 2', '{}');
+
+
+insert into homeworks(class_id, title, descr, attaches)
+values (1, 'HW 9', 'descr 2', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (1, 'HW 10', 'descr 2', '{}');
 
 insert into homeworks(class_id, title, descr, attaches)
 values (2, 'HW 1', 'descr 1', '{}');

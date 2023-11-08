@@ -38,7 +38,7 @@ export class VkMasterBot extends VkBot {
     private initMiddlewares(): void {
         this.vk.updates.on('message_new', this.sessionManager.middleware); // Для сцен, на будущее
         this.vk.updates.on('message_new', this.sceneManager.middleware); // Сцены
-
+      
         this.initCommandMiddlewares([
             {
                 command: CommandPatterns.Start,
@@ -58,14 +58,23 @@ export class VkMasterBot extends VkBot {
             {
                 command: CommandPatterns.Cancel,
                 handler: (context) => {
-                    if (context.scene.current) {
-                        context.scene.canceled = true;
+                    if (context.scene) {
+                    console.log('scene');
+                        try { context.scene.leave(); }
+                        catch {}
                     }
                 }
             },
         ]);
 
-        this.vk.updates.on('message_new', customSceneMiddleware);
+        this.vk.updates.on('message_new', this.sceneManager.middlewareIntercept);
+
+        this.vk.updates.on('message_new', (context, next) => {
+            if (context.state.isCommand) {
+                return next();
+            }
+            return context.send('Неизвестная команда');
+        });
     }
 
     private initSceneManager() {

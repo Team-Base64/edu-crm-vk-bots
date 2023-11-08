@@ -32,16 +32,12 @@ export namespace AcceptTokenScene {
                     return context.scene.step.next(); // Automatic exit, since this is the last scene
                 }
             ],
-            leaveHandler: leaveHandlerCustom({
-                msgCancel: {
-                    message: 'Принятие приглашения отменено',
-                    keyboard: MainKeyboard
-                },
-                msgDone: {
-                    message: 'Токен принят и проверяется',
-                    // keyboard: MainKeyboard
-                }
-            })
-        });
+            leaveHandler: (context) => {
+                console.log('leave handler cust ', context.scene);
+            }
+        },
+        
+        );
     }
+
 }
