@@ -7,5 +7,6 @@ export default  interface grpcOptions {
 }
 export const grpc_config : grpcOptions = {
     address: '127.0.0.1:8082',
+    //address: `host.docker.internal:8082`,
     credentials: grpc.credentials.createInsecure(),
 }

@@ -4,7 +4,7 @@ const postgres_config_localhost: ClientConfig = {
     user: "george",
     host: "localhost",
     password: "1234567890",
-    port: 8000,
+    port: 8500,
     database: 'vk_bots_db',
 }
 

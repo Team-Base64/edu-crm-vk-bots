@@ -20,6 +20,7 @@ export default class GRPCBackend implements Backend {
         this.client = new BotServiceClient(address, credentials, options);
         this.toSlaveHandlers = [];
         this.stream = null;
+        //this.streamConnent();
     }
 
     private streamConnent() {

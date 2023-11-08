@@ -4,7 +4,7 @@ services:
     image: "postgres:12"
     hostname: db
     ports:
-      - "8000:5432"
+      - "8500:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
 #      - ./tmp/postgres-data:/var/postgres_data  # Это для того чтобы после перезапуска докера база сохранялась
@@ -36,6 +36,8 @@ services:
         condition: service_healthy
     ports:
       - "8001:8001"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     networks:
       - my-network
 networks:
