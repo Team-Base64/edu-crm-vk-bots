@@ -1,12 +1,14 @@
 import { Keyboard } from "vk-io";
 import { HomeworkPayload } from "../../backend/models";
 import { paginate } from "../../helpers/pagination";
+import logger from "../../helpers/logger";
 
 const hwsOnPage = 4;
 
 export const HomeworksKeyboard = (homeworks: HomeworkPayload[], page: number) => {
+    logger.debug('Keyboard builder');
     const { data, isFirstPage, isLastPage } = paginate(homeworks, page, hwsOnPage);
-
+    logger.debug({data, isFirstPage, isLastPage});
     const prev = isFirstPage ?
         []
         :

@@ -4,26 +4,36 @@ import Store from "../../store/store";
 import Backend from "../../backend/backend";
 import { parseAttachments, uploadAttachments } from "../../helpers/attachmentsHelper";
 import { HomeworkPayload } from "../../backend/models";
+import logger from "../../helpers/logger";
 
-const cacheTime = 60 * 5 * 1000; // 5 минут
+const sceneLogger = logger.child({}, {
+    msgPrefix: 'Scene: ',
+});
+
+const cacheTime = 10; //60 * 5 * 1000; // 5 минут
 const cache = new Map<number, { homeworks: HomeworkPayload[], time: number }>();
 
 
 const getHomeworks = async (backend: Backend, class_id: number, page: number): Promise<HomeworkPayload[] | undefined> => {
+    sceneLogger.debug('Cache');
     const cached = cache.get(class_id);
 
     if (cached && cached.time + cacheTime > Date.now()) {
+        sceneLogger.debug('Cached');
         return cached.homeworks;
     }
 
+    sceneLogger.debug('Not cached');
     const { homeworks, ...homeworksError } = await backend.getClassHomeworks({ class_id: class_id });
 
     if (homeworksError.isError) {
+        sceneLogger.debug('Cache get error');
         return undefined;
     }
 
     cache.set(class_id, { homeworks: homeworks, time: Date.now() });
 
+    sceneLogger.debug({homeworks}, 'Cache done');
     return homeworks;
 }
 
@@ -51,7 +61,8 @@ export namespace SendSolutionScene {
                     const page = context?.messagePayload?.page || 0;
 
                     const homeworks = await getHomeworks(backend, class_id, page);
-
+                    sceneLogger.debug({homeworks}, 'Получил дз');
+                   
                     if (!homeworks) {
                         await context.send('Ошибка получения дз');
                         return context.scene.leave();

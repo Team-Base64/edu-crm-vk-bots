@@ -25,6 +25,11 @@ const wrapper = async () => {
     process.on(signal, wrapper);
 });
 
+process.on('uncaughtException', (e) => {
+    logger.error(e, 'uncaughtException');
+    process.exit(1);
+})
+
 export const gracefulStop = (handler: ExitHandler) => {
     handlers.push(handler);
 }

@@ -2,7 +2,7 @@ import GRPCBackend from "./backend/GRPC-backend/grpc-backend";
 import BackendMock from "./backend/mock/backend";
 import VkBotsManager from "./manager/manager";
 import { PostrgesStore } from "./store/PostrgeSQL/postrgesql";
-import {grpc_config} from "./backend/GRPC-backend/config";
+// import {grpc_config} from "./backend/GRPC-backend/config";
 import logger from "./helpers/logger";
 import postgres_config from "./store/PostrgeSQL/config";
 
@@ -17,12 +17,12 @@ import postgres_config from "./store/PostrgeSQL/config";
 
     // Init backend
 
-    // Mock backend
-    const backend = new BackendMock(postgres_config);
-    await backend.start();
+    // // Mock backend
+    // const backend = new BackendMock(postgres_config);
+    // await backend.start();
 
     // GRPC remote backend
-    // const backend = new GRPCBackend(grpc_config);
+    const backend = new GRPCBackend();
 
     const manager = new VkBotsManager(db, backend);
     await manager.init();
