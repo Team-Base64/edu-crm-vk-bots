@@ -82,7 +82,7 @@ export class PostrgesStore implements Store {
             });
     }
 
-    public async getInternalChatId(peer_id: number, group_id: number): Promise<{ class_id: number, internal_chat_id: number } | undefined> {
+    public async getChatInfo(peer_id: number, group_id: number): Promise<{ class_id: number, internal_chat_id: number } | undefined> {
         return this.db.query(`select internal_chat_id, class_id
                               from link_user_bot_chat
                               where vk_group_id = $1
@@ -97,12 +97,32 @@ export class PostrgesStore implements Store {
                 return { internal_chat_id: internal_chat_id, class_id: class_id };
             })
             .catch(e => {
-                posrgresLogger.error(e, 'Get internal_chat_id error');
+                posrgresLogger.error(e, 'Get chat info error');
+                return undefined;
+            });
+    }
+    
+    public getClassChat(peer_id: number, class_id: number): Promise<number | undefined> {
+        return this.db.query(`select vk_group_id
+        from link_user_bot_chat
+        where vk_user_id = $1
+          and class_id = $2;`,
+            [peer_id, class_id])
+            .then(data => {
+                posrgresLogger.debug({rows: data.rows}, 'Связь чата и пользователя');
+                if (!data.rowCount) {
+                    return -1;
+                }
+                const group_id = data.rows[0].vk_group_id;
+                return group_id;
+            })
+            .catch(e => {
+                posrgresLogger.error(e, 'Get student s class bot error');
                 return undefined;
             });
     }
 
-    public setInternalChatId(peer_id: number, group_id: number, internal_chat_id: number, class_id: number): Promise<boolean> {
+    public setChatInfo(peer_id: number, group_id: number, internal_chat_id: number, class_id: number): Promise<boolean> {
         return this.db.query(`insert into link_user_bot_chat
                                   (internal_chat_id, vk_group_id, vk_user_id, class_id)
                               values ($1, $2, $3, $4)
@@ -115,7 +135,7 @@ export class PostrgesStore implements Store {
                 return true;
             })
             .catch(e => {
-                posrgresLogger.error(e, 'Link user to chat_id error');
+                posrgresLogger.error(e, 'Link user to chat and class error');
                 return false;
             })
     }

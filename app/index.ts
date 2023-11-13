@@ -18,11 +18,11 @@ import postgres_config from "./store/PostrgeSQL/config";
     // Init backend
 
     // // Mock backend
-    // const backend = new BackendMock(postgres_config);
-    // await backend.start();
+    const backend = new BackendMock(postgres_config);
+    await backend.start();
 
     // GRPC remote backend
-    const backend = new GRPCBackend();
+    // const backend = new GRPCBackend();
 
     const manager = new VkBotsManager(db, backend);
     await manager.init();

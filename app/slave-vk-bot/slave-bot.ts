@@ -84,7 +84,7 @@ export default class VkSlaveBot extends VkBot {
     private async handleGetHomeworks(context: MessageContext<ContextDefaultState>) {
         const { peerId } = context;
 
-        const resp = await this.db.getInternalChatId(peerId, this.group_id);
+        const resp = await this.db.getChatInfo(peerId, this.group_id);
         if (!resp) {
             slaveBotLogger.warn({peerId}, 'Get internal chat id error');
             return;
@@ -121,7 +121,7 @@ export default class VkSlaveBot extends VkBot {
 
         // Проверить что пользователь привязан к боту и чату в crm 
         // Получить из базы chat_id 
-        const chatData = await this.db.getInternalChatId(peerId, group_id);
+        const chatData = await this.db.getChatInfo(peerId, group_id);
 
         if (!chatData) {
             slaveBotLogger.debug({ peerId, group_id }, 'Vk user is not linked to bot');
