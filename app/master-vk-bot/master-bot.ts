@@ -16,8 +16,8 @@ export interface InviteData {
     peer_id: number,
 }
 
-const masterBotLogger = logger.child({}, { 
-    msgPrefix: 'VkMasterBot: ' 
+const masterBotLogger = logger.child({}, {
+    msgPrefix: 'VkMasterBot: '
 });
 
 export class VkMasterBot extends VkBot {
@@ -85,7 +85,7 @@ export class VkMasterBot extends VkBot {
         // Если не ок
         if (validateTokenError.isError) {
             masterBotLogger.debug({ invite_token }, 'Invite token not found');
-            this.sendMessageToClient(peer_id, 'Не нашли токен для приглашения ' + invite_token);
+            this.sendMessageToClient(peer_id, { internal_chat_id: -1, attachmentURLs: ['https://africau.edu/images/default/sample.pdf', 'https://img.freepik.com/free-photo/full-shot-woman-body-language_23-2149818879.jpg'], text: 'Не нашли токен для приглашения ' + invite_token });
             return;
         }
 
@@ -99,7 +99,7 @@ export class VkMasterBot extends VkBot {
         // ошибка undefined        
         if (!current_student_id) {
             masterBotLogger.warn('Get student_id error');
-            this.sendMessageToClient(peer_id, 'Ошибка проверки аккаунта. Повторите позже');
+            this.sendMessageToClient(peer_id, { attachmentURLs: [], internal_chat_id: 0, text: 'Ошибка проверки аккаунта. Повторите позже' });
             return;
         }
 
@@ -126,7 +126,7 @@ export class VkMasterBot extends VkBot {
             // Если ошибка 
             if (isError) {
                 masterBotLogger.warn(error, 'Create student error');
-                this.sendMessageToClient(peer_id, 'Не можем зарегистрировать');
+                this.sendMessageToClient(peer_id, { attachmentURLs: [], internal_chat_id: 0, text: 'Не можем зарегистрировать' });
                 return;
             }
 
@@ -137,7 +137,7 @@ export class VkMasterBot extends VkBot {
 
             if (!isOk) {
                 masterBotLogger.warn('Не получилось связать ВК и студента');
-                this.sendMessageToClient(peer_id, 'Не получилось привязать вк');
+                this.sendMessageToClient(peer_id, { attachmentURLs: [], internal_chat_id: 0, text: 'Не получилось привязать вк' });
                 return;
             }
 
@@ -155,14 +155,14 @@ export class VkMasterBot extends VkBot {
         // Ошибка при получении ботов
         if (!free_bot_groups_ids) {
             masterBotLogger.error({ peer_id }, 'Check vacant bots error for');
-            this.sendMessageToClient(peer_id, 'Повторите запрос позже');
+            this.sendMessageToClient(peer_id, { attachmentURLs: [], internal_chat_id: 0, text: 'Повторите запрос позже' });
             return;
         }
 
         // Нет свободных ботов
         if (free_bot_groups_ids.length < 1) {
             masterBotLogger.debug({ peer_id }, 'Vacant bots not found for');
-            this.sendMessageToClient(peer_id, 'Все боты заняты :с');
+            this.sendMessageToClient(peer_id, { attachmentURLs: [], internal_chat_id: 0, text: 'Все боты заняты :с' });
             return;
         }
 
@@ -173,7 +173,7 @@ export class VkMasterBot extends VkBot {
 
         if (createChatError.isError) {
             masterBotLogger.error('Creating chat error');
-            this.sendMessageToClient(peer_id, 'Что-то пошло не так');
+            this.sendMessageToClient(peer_id, { attachmentURLs: [], internal_chat_id: 0, text: 'Что-то пошло не так' });
             return;
         }
 
@@ -189,13 +189,15 @@ export class VkMasterBot extends VkBot {
 
         if (!isOk) {
             masterBotLogger.error({ peer_id, group_id, internal_chat_id }, 'Linking vacant bot error');
-            this.sendMessageToClient(peer_id, 'Ошибка :с');
+            this.sendMessageToClient(peer_id, { attachmentURLs: [], internal_chat_id: 0, text: 'Ошибка :с' });
             return;
         }
 
-        this.sendMessageToClient(peer_id, `Токен принят!\n\n
+        this.sendMessageToClient(peer_id, {
+            attachmentURLs: [], internal_chat_id: 0, text: `Токен принят!\n\n
         Для связи с преподавателем используйте:\n
-        https://vk.com/im?sel=-${group_id}`)
+        https://vk.com/im?sel=-${group_id}`
+        })
 
         return;
     }

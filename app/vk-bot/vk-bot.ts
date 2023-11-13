@@ -5,6 +5,8 @@ import Store from "../store/store";
 import { gracefulStop } from "../helpers/graceful-stop";
 import Backend from "../backend/backend";
 import logger from "../helpers/logger";
+import { MessagePayload } from "../backend/models";
+import { loadAttachments } from "../helpers/attachmentsHelper";
 
 const vkBotLogger = logger.child({}, {
     msgPrefix: 'VkBotShared: ',
@@ -85,12 +87,15 @@ export default class VkBot {
             });
     }
 
-    public async sendMessageToClient(peer_id: number, text: string) {
+    public async sendMessageToClient(peer_id: number, msg: MessagePayload) {
+        const { text, attachmentURLs } = msg;
+        const attaches = await loadAttachments(peer_id, this.vk, attachmentURLs);
         return this.vk.api.messages.send({
             peer_id: peer_id,
             message: text,
+            attachment: attaches,
             random_id: Date.now() + peer_id,
-        })
+        });
     }
 
     protected initCommandMiddlewares = (cmdMiddleware: CommandMiddleware[]): void => {

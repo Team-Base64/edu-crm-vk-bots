@@ -127,6 +127,6 @@ export default class VkBotsManager {
             return;
         }
 
-        return targ_bot.sendMessageToClient(peer_id, payload.text);
+        return targ_bot.sendMessageToClient(peer_id, payload);
     }
 }
