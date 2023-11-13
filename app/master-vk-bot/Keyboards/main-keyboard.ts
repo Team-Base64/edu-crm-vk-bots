@@ -8,3 +8,11 @@ export const MainKeyboard = Keyboard.builder()
         },
         color: "positive",
     })
+    .row()
+    .textButton({
+        label: 'Мои чаты',
+        payload: {
+            command: '/chats'
+        },
+        color: "secondary",
+    })

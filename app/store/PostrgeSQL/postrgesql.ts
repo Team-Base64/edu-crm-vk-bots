@@ -101,7 +101,7 @@ export class PostrgesStore implements Store {
                 return undefined;
             });
     }
-    
+
     public getClassChat(peer_id: number, class_id: number): Promise<number | undefined> {
         return this.db.query(`select vk_group_id
         from link_user_bot_chat
@@ -109,7 +109,7 @@ export class PostrgesStore implements Store {
           and class_id = $2;`,
             [peer_id, class_id])
             .then(data => {
-                posrgresLogger.debug({rows: data.rows}, 'Связь чата и пользователя');
+                posrgresLogger.debug({ rows: data.rows }, 'Связь чата и пользователя');
                 if (!data.rowCount) {
                     return -1;
                 }
@@ -216,4 +216,20 @@ export class PostrgesStore implements Store {
                 return undefined;
             });
     }
+
+    public getStudentChats(peer_id: number): Promise<number[] | undefined> {
+        return this.db.query(`select vk_group_id 
+        from link_user_bot_chat
+         where vk_user_id = $1;`,
+            [peer_id])
+
+            .then(data => {
+                return data.rows.map(r => r.vk_group_id);
+            })
+            .catch(e => {
+                posrgresLogger.error(e, 'Get student chats error');
+                return undefined;
+            });
+    }
+
 }

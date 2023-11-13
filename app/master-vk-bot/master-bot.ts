@@ -9,6 +9,8 @@ import { MainKeyboard } from "./Keyboards/main-keyboard";
 import { AcceptTokenScene } from "./Scenes/accept-token-scene";
 import { customSceneMiddleware } from "./Scenes/custom-scene-middleware";
 import logger from "../helpers/logger";
+import { MessageContext } from "vk-io";
+import { ChatLinkKeyboard } from "./Keyboards/chat-link-keyboard";
 
 export interface InviteData {
     invite_token: string,
@@ -56,6 +58,10 @@ export class VkMasterBot extends VkBot {
             },
 
             {
+                command: CommandPatterns.Chats,
+                handler: this.handleGetChats.bind(this),
+            },
+            {
                 command: CommandPatterns.Cancel,
                 handler: (context) => {
                     if (context.scene.current) {
@@ -72,5 +78,26 @@ export class VkMasterBot extends VkBot {
         this.sceneManager.addScenes([
             AcceptTokenScene.scene(this.db, this.backend, this.vk),
         ]);
+    }
+
+    private async handleGetChats(context: MessageContext) {
+        const { peerId } = context;
+        const chats = await this.db.getStudentChats(peerId);
+        if (!chats) {
+            masterBotLogger.error('Get user chats error');
+            return context.send('Не удалось получить список чатов');
+        }
+
+        if (!chats.length) {
+            return context.send('У вас нет активных чатов');
+        }
+
+        return context.send({
+            message: 'Ваши чаты',
+            keyboard: ChatLinkKeyboard(chats.map(c => {
+                return { group_id: c };
+            }))
+                .inline(),
+        });
     }
 }

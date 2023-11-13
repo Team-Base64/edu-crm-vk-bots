@@ -17,6 +17,8 @@ export interface VkBotLink {
 
 
 export default abstract class Store {
+    // Получить список чатов пользователя
+    public abstract getStudentChats(peer_id : number) : Promise<number[] | undefined>;
 
     // Получить студента по vk_id
     public abstract getStudentId(peer_id : number) : Promise<number | undefined>;
