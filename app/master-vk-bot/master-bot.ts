@@ -10,7 +10,8 @@ import { AcceptTokenScene } from "./Scenes/accept-token-scene";
 import { customSceneMiddleware } from "./Scenes/custom-scene-middleware";
 import logger from "../helpers/logger";
 import { MessageContext } from "vk-io";
-import { ChatLinkKeyboard } from "./Keyboards/chat-link-keyboard";
+import { ChatLinkButton, ChatLinkKeyboard } from "./Keyboards/chat-link-keyboard";
+import { paginatedKeyboard } from "../helpers/pagination";
 
 export interface InviteData {
     invite_token: string,
@@ -92,12 +93,15 @@ export class VkMasterBot extends VkBot {
             return context.send('У вас нет активных чатов');
         }
 
+        const page: number = context.messagePayload.page || 0;
+        
+        const data = chats.map((id, index) => {
+            return { group_id: id, title: `Чат №${index + 1}` };
+        });
+
         return context.send({
             message: 'Ваши чаты',
-            keyboard: ChatLinkKeyboard(chats.map(c => {
-                return { group_id: c };
-            }))
-                .inline(),
+            keyboard: paginatedKeyboard(data, ChatLinkButton, page, '/chats').inline(),
         });
     }
 }

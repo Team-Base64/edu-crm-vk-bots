@@ -1,9 +1,11 @@
+import { IKeyboardProxyButton, Keyboard } from "vk-io";
 import logger from "./logger";
+import { P } from "pino";
 
-export const paginate = (data: any[], page: number, els_on_page : number) : {
-    data : any[],
-    isFirstPage : boolean,
-    isLastPage : boolean,
+export const paginate = (data: any[], page: number, els_on_page: number): {
+    data: any[],
+    isFirstPage: boolean,
+    isLastPage: boolean,
 } => {
     logger.debug('Keyboard builder');
 
@@ -21,4 +23,47 @@ export const paginate = (data: any[], page: number, els_on_page : number) : {
         isFirstPage: isFirstPage,
         isLastPage: isLastPage,
     }
+}
+
+export function paginatedKeyboard<T>(
+    content: T[],
+    buttonRender: (item: T) => IKeyboardProxyButton,
+    page: number,
+    command?: string
+) {
+    const { data, isFirstPage, isLastPage } = paginate(content, page, 4);
+   
+    const prev = isFirstPage ? [] :
+        [
+            Keyboard.textButton({
+                label: 'Предудущая',
+                payload: {
+                    command: command ? command : '',
+                    page: page - 1,
+                },
+                color: 'secondary',
+            })
+        ];
+
+    const next = isLastPage ? [] :
+        [
+            Keyboard.textButton({
+                label: 'Следующая',
+                payload: {
+                    command: command ? command : '',
+                    page: page + 1,
+                },
+                color: 'secondary',
+            })
+        ];
+
+    return Keyboard.keyboard(
+        [
+            ...data.map(item => buttonRender(item)),
+            [
+                ...prev,
+                ...next,
+            ]
+        ]
+    );
 }

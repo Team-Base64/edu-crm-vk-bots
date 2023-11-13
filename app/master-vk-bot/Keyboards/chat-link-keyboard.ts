@@ -1,12 +1,20 @@
 import { Keyboard } from "vk-io";
 
-export const ChatLinkKeyboard = (chats: { group_id: number, title?: string }[]) => {
+interface props {
+    group_id: number;
+    title?: string
+};
+
+export const ChatLinkButton = (data: props) => {
+    const { group_id, title } = data;
+    return Keyboard.urlButton({
+        label: title || 'Ссылка на чат',
+        url: `https://vk.com/im?sel=-${group_id}`,
+    });
+}
+
+export const ChatLinkKeyboard = (data: props) => {
     return Keyboard.keyboard([
-        chats.map(({ group_id, title }, i) => {
-            return Keyboard.urlButton({
-                label: title || `Чат №${i + 1}`,
-                url: `https://vk.com/im?sel=-${group_id}`,
-            });
-        }),
+        ChatLinkButton(data)
     ]);
 }

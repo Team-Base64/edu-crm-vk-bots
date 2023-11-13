@@ -1,10 +1,11 @@
 import { StepScene } from "@vk-io/scenes";
-import { HomeworksKeyboard } from "../Keyboards/homeworks-keyboard";
 import Store from "../../store/store";
 import Backend from "../../backend/backend";
 import { parseAttachments, uploadAttachments } from "../../helpers/attachmentsHelper";
 import { HomeworkPayload } from "../../backend/models";
 import logger from "../../helpers/logger";
+import { paginatedKeyboard } from "../../helpers/pagination";
+import { HomeworkButton } from "../Keyboards/homeworks-keyboard";
 
 const sceneLogger = logger.child({}, {
     msgPrefix: 'Scene: ',
@@ -61,7 +62,6 @@ export namespace SendSolutionScene {
                     const page = context?.messagePayload?.page || 0;
 
                     const homeworks = await getHomeworks(backend, class_id, page);
-                    sceneLogger.debug({homeworks}, 'Получил дз');
                    
                     if (!homeworks) {
                         await context.send('Ошибка получения дз');
@@ -77,8 +77,7 @@ export namespace SendSolutionScene {
                         await context.send('Пожалуйста, выберете задание');
                     }
 
-                    const kb = HomeworksKeyboard(homeworks, page);
-
+                    const kb = paginatedKeyboard(homeworks, HomeworkButton, page);
                     await context.send({
                         message: `Страница ${page + 1}`,
                         keyboard: kb,

@@ -81,7 +81,7 @@ export namespace AcceptTokenScene {
                         sceneLogger.debug('Пользователь уже в классе');
                         await context.send({
                             message: 'Вы уже участник класса',
-                            keyboard: ChatLinkKeyboard([{group_id, title: 'Ссылка на чат'}]).inline(),
+                            keyboard: ChatLinkKeyboard({ group_id }).inline(),
                         });
                         return context.scene.leave();
                     }
@@ -239,7 +239,7 @@ export namespace AcceptTokenScene {
 
                     await context.send({
                         message: 'Токен принят!',
-                        keyboard: ChatLinkKeyboard([{group_id, title: 'Чат с преподавателем'}]).inline(),
+                        keyboard: ChatLinkKeyboard({ group_id, title: 'Чат с преподавателем' }).inline(),
                     });
 
                     return context.scene.step.next();

@@ -46,6 +46,9 @@ values ('123', 1);
 insert into tokens(token, class_id)
 values ('321', 2);
 
+insert into tokens(token, class_id)
+values ('aaa', 3);
+
 -- Fill homeworks
 
 insert into homeworks(class_id, title, descr, attaches)
@@ -63,3 +66,24 @@ values (2, 'HW 2', 'descr 2', '{}');
 
 insert into homeworks(class_id, title, descr, attaches)
 values (2, 'HW 3', 'descr 3', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (2, 'HW 4', 'descr 3', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (2, 'HW 5', 'descr 3', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (2, 'HW 6', 'descr 3', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (2, 'HW 7', 'descr 3', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (2, 'HW 8', 'descr 3', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (2, 'HW 9', 'descr 3', '{}');
+
+insert into homeworks(class_id, title, descr, attaches)
+values (2, 'HW 10', 'descr 3', '{}');
