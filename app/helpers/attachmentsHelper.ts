@@ -1,5 +1,5 @@
 import mime from "mime";
-import { Attachment, AttachmentType, ExternalAttachment } from "vk-io";
+import { Attachment, AttachmentType, ExternalAttachment, VK } from "vk-io";
 import { changeHttpsToHttp } from "./changeHttpsToHttp";
 import Backend from "../backend/backend";
 import logger from "./logger";
@@ -15,6 +15,10 @@ const parserLogger = logger.child({}, {
 
 const uploaderLogger = logger.child({}, {
     msgPrefix: 'AttachUploader: ',
+});
+
+const loaderLogger = logger.child({}, {
+    msgPrefix: 'AttachLoader: ',
 });
 
 export const parseAttachments = (attachments: (Attachment<{}, string> | ExternalAttachment<{}, string>)[]): ParsedAttachment[] => {
@@ -35,7 +39,7 @@ export const parseAttachments = (attachments: (Attachment<{}, string> | External
                     parserLogger.debug({ extension }, 'Не удалось получить mimetype');
                     break;
                 }
-                parserLogger.debug({mimetype}, 'Получил документ');
+                parserLogger.debug({ mimetype }, 'Получил документ');
 
                 parsedAttachments.push({
                     url: changeHttpsToHttp(url),
@@ -67,7 +71,7 @@ export const parseAttachments = (attachments: (Attachment<{}, string> | External
                     break;
                 }
 
-                parserLogger.debug({mimetype}, 'Получил фотографию');
+                parserLogger.debug({ mimetype }, 'Получил фотографию');
                 parsedAttachments.push({
                     url: changeHttpsToHttp(fullURL),
                     mimetype: mimetype,
@@ -105,7 +109,57 @@ export const uploadAttachments = async (parsedAttachments: ParsedAttachment[], b
         internal_urls.push(internalFileURL);
     }
 
-    parserLogger.debug({internal_urls}, 'Загрузка закончена');
+    parserLogger.debug({ internal_urls }, 'Загрузка закончена');
 
     return internal_urls;
+}
+
+export const loadAttachments = async (peer_id: number, vk: VK, files: string[]): Promise<Attachment[]> => {
+    const attaches: Attachment[] = [];
+
+    for (let file of files) {
+        const mimetype = mime.getType(file);
+
+        if (!mimetype) {
+            loaderLogger.debug({file}, 'Mimetype undefined');
+            continue;
+        }
+
+        if (mimetype.startsWith('image')) {
+
+            try {
+                const pic = await vk.upload.messagePhoto({
+                    source: {
+                        value: file,
+                    },
+                });
+                attaches.push(pic);
+            } catch (e) {
+                loaderLogger.warn(e, 'Cant load attach to VK');
+            }
+
+        } else if (mimetype.startsWith('application')) {
+
+            try {
+                const doc = await vk.upload.messageDocument({
+                    peer_id: peer_id,
+                    title: file.slice(
+                        file.lastIndexOf('/') + 1,
+                        file.lastIndexOf('.')
+                    ),
+                    source: {
+                        value: file,
+                    },
+                });
+                attaches.push(doc);
+            } catch (e) {
+                loaderLogger.warn(e, 'Cant load Document');
+            }
+        }
+        else {
+            loaderLogger.debug({ mimetype }, 'Unknown mimetype');
+        }
+    }
+
+    return attaches;
 }
