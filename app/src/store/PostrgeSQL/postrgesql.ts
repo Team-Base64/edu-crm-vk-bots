@@ -1,18 +1,19 @@
-import { gracefulStop } from "../../helpers/graceful-stop";
-import logger from "../../helpers/logger";
 import Store, { VkBotData, VkBotLink } from "../store";
-import { Client, ClientConfig } from "pg";
+import postgres_config from "./config";
+import logger from "../../helpers/logger";
+import { gracefulStop } from "../../helpers/graceful-stop";
+import { Client } from "pg";
 
 const posrgresLogger = logger.child({}, {
     msgPrefix: 'PostrgesStore'
 });
 
-export class PostrgesStore implements Store {
+export default class PostrgesStore implements Store {
 
     db: Client;
 
-    constructor(config: ClientConfig) {
-        this.db = new Client(config);
+    constructor() {
+        this.db = new Client(postgres_config);
 
         gracefulStop(async () => {
             await this.stop.bind(this);

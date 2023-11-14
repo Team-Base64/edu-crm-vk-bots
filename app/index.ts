@@ -1,10 +1,11 @@
-import GRPCBackend from "./backend/GRPC-backend/grpc-backend";
-import BackendMock from "./backend/mock/backend";
-import VkBotsManager from "./manager/manager";
-import { PostrgesStore } from "./store/PostrgeSQL/postrgesql";
-// import {grpc_config} from "./backend/GRPC-backend/config";
-import logger from "./helpers/logger";
-import postgres_config from "./store/PostrgeSQL/config";
+import PostrgesStore from "./src/store/PostrgeSQL/postrgesql";
+
+import GRPCBackend from "./src/backend/GRPC-backend/grpc-backend";
+import BackendMock from "./src/backend/mock/backend";
+
+import VkBotsManager from "./src/manager/manager";
+
+import logger from "./src/helpers/logger";
 
 // Main function
 (async () => {
@@ -12,18 +13,16 @@ import postgres_config from "./store/PostrgeSQL/config";
     logger.info('Starting app...');
 
     // Init database
-    const db = new PostrgesStore(postgres_config);
+    const db = new PostrgesStore();
     await db.start();
 
     // Init backend
-
-    // // Mock backend
-    const backend = new BackendMock(postgres_config);
+    const backend = process.env.MOCK ?
+         new BackendMock() :
+         new GRPCBackend();
     await backend.start();
 
-    // GRPC remote backend
-    // const backend = new GRPCBackend();
-
+    // Init manager
     const manager = new VkBotsManager(db, backend);
     await manager.init();
     await manager.startAll();

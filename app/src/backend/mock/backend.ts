@@ -1,8 +1,9 @@
-import { Client, ClientConfig } from "pg";
+import { Client } from "pg";
 import { gracefulStop } from "../../helpers/graceful-stop";
 import Backend from "../backend";
 import logger from "../../helpers/logger";
 import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
+import postgres_config from "../../store/PostrgeSQL/config";
 
 const backendLogger = logger.child({}, {
     msgPrefix: 'MOCKbackend'
@@ -12,8 +13,8 @@ class BackendMock implements Backend {
     db: Client;
     toSlaveHandler: ServerMessageToSlaveHandler[];
 
-    constructor(db_config: ClientConfig) {
-        this.db = new Client(db_config);
+    constructor() {
+        this.db = new Client(postgres_config);
         this.toSlaveHandler = [];
         gracefulStop(this.stop.bind(this));
     }
@@ -74,7 +75,7 @@ class BackendMock implements Backend {
         const id = await this.db_createSolution(text, attachmentURLs);
 
         if (id) {
-            backendLogger.debug({homework_id, solution, id }, 'Solution отправлено');
+            backendLogger.debug({ homework_id, solution, id }, 'Solution отправлено');
             return {};
         }
         backendLogger.error({ id }, 'Solution ошибка отправки');

@@ -8,6 +8,7 @@ import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as 
 import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
 
 import client from "./config";
+import { gracefulStop } from "../../helpers/graceful-stop";
 
 const streamReconnectTimeout = 3;
 
@@ -19,11 +20,18 @@ export default class GRPCBackend implements Backend {
     private toSlaveHandlers: ServerMessageToSlaveHandler[];
 
     constructor() {
-        //this.client = new BotServiceClient('127.0.0.1:8082', grpc.credentials.createInsecure());
         this.client = client
         this.toSlaveHandlers = [];
         this.stream = null;
+        gracefulStop(this.stop.bind(this));
+    }
+
+    public async start(): Promise<any> {
         this.streamConnent();
+    }
+
+    public async stop(): Promise<any> {
+        this.client.close();
     }
 
     private streamConnent() {

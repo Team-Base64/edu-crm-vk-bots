@@ -5,14 +5,15 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start:deploy": "tsc && node build",
-    "start": "ts-node index.ts"
+    "start": "tsc && node build",
+    "dev": "ts-node index.ts"
   },
   "author": "George Illarionov",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.8.7",
     "@types/pg": "^8.10.7",
+    "@types/mime": "^3.0.3",
     "grpc_tools_node_protoc_ts": "^5.3.3",
     "grpc-tools": "^1.12.4",
     "node-json-db": "^2.3.0",
@@ -21,9 +22,9 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.9",
-    "@types/mime": "^3.0.3",
     "@vk-io/scenes": "^1.2.1",
     "@vk-io/session": "^2.2.1",
+    "dotenv": "^16.3.1",
     "mime": "^3.0.0",
     "pg": "^8.11.3",
     "pino": "^8.16.1",

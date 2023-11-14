@@ -33,4 +33,7 @@ export default abstract class Backend {
     // TODO 
     // Отправка сообщение от бэка к мастер боту
     // public abstract  addHandleMessageFromServerToMaster(handler : ServerMessageToMasterHandler) : Promise<any> ;
+
+    public abstract start() : Promise<any>;
+    public abstract stop() : Promise<any>;
 }
