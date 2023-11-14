@@ -235,7 +235,7 @@ export namespace AcceptTokenScene {
                     }
 
                     // Готово
-                    sceneLogger.error('Готово!');
+                    sceneLogger.debug('Готово!');
 
                     await context.send({
                         message: 'Токен принят!',
