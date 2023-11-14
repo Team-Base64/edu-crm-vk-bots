@@ -8,5 +8,5 @@ const postgres_config: ClientConfig = {
     port: Number(process.env.POSTGRES_PORT),
     database: process.env.POSTGRES_DB,
 }
-console.log(postgres_config);
+
 export default postgres_config;
