@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node build",
+    "start": "export $(xargs <.env) && tsc && node build",
+    "start:docker": "tsc && node build",
     "dev": "ts-node index.ts"
   },
   "author": "George Illarionov",
