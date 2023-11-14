@@ -1,9 +1,10 @@
-FROM node:18.17.1
-COPY . /home/app
-WORKDIR /home/app
+FROM node:18-alpine
 
+WORKDIR /app
+
+COPY package.json package-lock.json ./
 RUN npm ci
 
-EXPOSE 8001
+COPY ./ ./
 
-CMD npm start
+ENTRYPOINT ["npm", "run", "start:docker"]

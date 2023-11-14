@@ -29,3 +29,6 @@ dist
 tmp
 *.env
 !example.env
+
+3_MOCK_init.sql
+2_SECRET_fill.sql

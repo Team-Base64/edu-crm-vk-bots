@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS "vk_bots" CASCADE;
+
+DROP TYPE IF EXISTS "bot_type" CASCADE;
+
+DROP TABLE IF EXISTS "link_user_student" CASCADE;
+
+DROP TABLE IF EXISTS "link_user_bot_chat" CASCADE;
