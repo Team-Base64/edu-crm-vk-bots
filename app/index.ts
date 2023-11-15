@@ -17,7 +17,7 @@ import logger from "./src/helpers/logger";
     await db.start();
 
     // Init backend
-    const backend = process.env.MOCK ?
+    const backend = process.env.MOCK === "true" ?
          new BackendMock() :
          new GRPCBackend();
     await backend.start();
@@ -27,4 +27,3 @@ import logger from "./src/helpers/logger";
     await manager.init();
     await manager.startAll();
 })();
-
