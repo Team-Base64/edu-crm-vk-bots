@@ -7,7 +7,7 @@ env:
   IMAGE: "ghcr.io/team-base64/edu-crm-vk-bots-app"
   CONTAINER: "vk"
   SQL_SRC: "vk-bots-sql"
-  DATA_FILE: "vk-bots-data"
+  DATA_FILE: "*-data"
   CONTAINER_DB: "vkdb"
 
 permissions:
