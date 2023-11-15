@@ -50,12 +50,12 @@ export default class GRPCBackend implements Backend {
         backendLogger.error(err, 'GRPC error');
     }
 
-    private streamDataHandler(chunk: { array: Array<string> }): void {
+    private streamDataHandler(chunk: any): void {
         try {
             const message: MessagePayload = {
                 internal_chat_id: Number(chunk.array[0]),
-                text: chunk.array[1],
-                attachmentURLs: [],
+                text: String(chunk.array[1]),
+                attachmentURLs: chunk.array[2] as string[],
             };
 
             backendLogger.debug({ message }, 'GRPC get message from server');
