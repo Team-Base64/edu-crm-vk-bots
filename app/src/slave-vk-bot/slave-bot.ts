@@ -1,16 +1,16 @@
-import VkBot from "../vk-bot/vk-bot"
-import Store from "../store/store";
-import Backend from "../backend/backend";
-import { ContextDefaultState, MessageContext } from "vk-io";
-import logger from "../helpers/logger";
 import { NextMiddleware } from "middleware-io";
+import { ContextDefaultState, MessageContext } from "vk-io";
+import Backend from "../backend/backend";
+import logger from "../helpers/logger";
+import Store from "../store/store";
+import VkBot from "../vk-bot/vk-bot";
 
+import { SceneManager } from "@vk-io/scenes";
+import { SessionManager } from "@vk-io/session";
+import { parseAttachments, uploadAttachments } from "../helpers/attachmentsHelper";
 import { CommandPatterns } from "./Commands/command-patterns";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
-import { SessionManager } from "@vk-io/session";
-import { SceneManager } from "@vk-io/scenes";
 import { SendSolutionScene } from "./Scenes/send-solution-scene";
-import { parseAttachments, uploadAttachments } from "../helpers/attachmentsHelper";
 
 const slaveBotLogger = logger.child({}, {
     msgPrefix: 'SlaveVkBot: '
@@ -69,6 +69,26 @@ export default class VkSlaveBot extends VkBot {
                         context.scene.canceled = true;
                     }
                 }
+            },
+            {
+                command: CommandPatterns.Start,
+                handler: ctx => {
+                    return ctx.send({
+                        message: 'Все готово! Можете начинать общаться с преподавателем.',
+                        keyboard: MainKeyboard
+                    });
+                }
+            },
+            {
+                command: CommandPatterns.Help,
+                handler: ctx => {
+                    return ctx.send(
+                        'Добро пожаловать в VK бота сервиса EDUCRM!\n' +
+                        'Важные замечания:\n' +
+                        '- В нашем сервисе можно прикреплять только картинки и pdf' +
+                        '- Не прикрепляйте более 3 файлов или фоток. Скорее всего ничего не отправится (('
+                    );
+                }
             }
         ]);
 
@@ -86,7 +106,7 @@ export default class VkSlaveBot extends VkBot {
 
         const resp = await this.db.getChatInfo(peerId, this.group_id);
         if (!resp) {
-            slaveBotLogger.warn({peerId}, 'Get internal chat id error');
+            slaveBotLogger.warn({ peerId }, 'Get internal chat id error');
             return;
         }
 
@@ -119,8 +139,8 @@ export default class VkSlaveBot extends VkBot {
         const { peerId } = context;
         const { group_id } = this;
 
-        // Проверить что пользователь привязан к боту и чату в crm 
-        // Получить из базы chat_id 
+        // Проверить что пользователь привязан к боту и чату в crm
+        // Получить из базы chat_id
         const chatData = await this.db.getChatInfo(peerId, group_id);
 
         if (!chatData) {
@@ -128,7 +148,7 @@ export default class VkSlaveBot extends VkBot {
             return context.send("С этим ботом не связан ваш преподаватель", { peer_id: peerId });
         }
 
-        // Получить stundent_id; 
+        // Получить stundent_id;
         const stundent_id = await this.db.getStudentId(peerId);
 
         if (!stundent_id) {
@@ -147,6 +167,7 @@ export default class VkSlaveBot extends VkBot {
         }
 
         const { peerId, $groupId, text, attachments } = context;
+
         const internal_chat_id: number = context.state.internal_chat_id;
 
         if (!internal_chat_id) {
@@ -167,7 +188,7 @@ export default class VkSlaveBot extends VkBot {
         }
 
 
-        slaveBotLogger.debug({uploaded_attaches}, 'Upload attachments in message');
+        slaveBotLogger.debug({ uploaded_attaches }, 'Upload attachments in message');
         // Собрать сообщение
         // Отправить сообщение на бэкэнд
         const isOk = await this.backend.resendMessageFromClient({

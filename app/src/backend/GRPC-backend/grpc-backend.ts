@@ -1,14 +1,14 @@
 import Backend from "../backend";
 // import grpcOptions from "./config";
+import grpc from "@grpc/grpc-js";
 import logger from "../../helpers/logger";
 import { BotChatClient } from "./model_grpc_pb";
-import grpc from "@grpc/grpc-js";
 //const grpc = require('@grpc/grpc-js');
-import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as GRPCMessage, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
 import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
+import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as GRPCMessage, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
 
-import client from "./config";
 import { gracefulStop } from "../../helpers/graceful-stop";
+import client from "./config";
 
 const streamReconnectTimeout = 3;
 
@@ -20,7 +20,7 @@ export default class GRPCBackend implements Backend {
     private toSlaveHandlers: ServerMessageToSlaveHandler[];
 
     constructor() {
-        this.client = client
+        this.client = client;
         this.toSlaveHandlers = [];
         this.stream = null;
         gracefulStop(this.stop.bind(this));
@@ -54,7 +54,7 @@ export default class GRPCBackend implements Backend {
         try {
             const message: MessagePayload = {
                 internal_chat_id: Number(chunk.array[0]),
-                text: String(chunk.array[1]),
+                text: String(chunk.array[1] ?? ''),
                 attachmentURLs: chunk.array[2] as string[],
             };
 
@@ -111,7 +111,7 @@ export default class GRPCBackend implements Backend {
         const req = new GetHomeworksRequest();
         req.setClassid(class_id);
 
-        return new Promise ((resolve) => {
+        return new Promise((resolve) => {
             this.client.getHomeworks(req, (err, resp) => {
                 if (err) {
                     backendLogger.warn(err, 'Backend get homeworks error');
@@ -230,7 +230,9 @@ export default class GRPCBackend implements Backend {
     }
 
     public resendFromServerToSlave(payload: MessagePayload): void {
-        this.toSlaveHandlers.forEach(h => h(payload));
+        this.toSlaveHandlers.forEach(h => h(payload).catch(
+            error => backendLogger.error('resendFromServerToSlave: ' + error)
+        ));
     }
 
     public addHandleMessageFromServerToSlave(handler: ServerMessageToSlaveHandler): void {

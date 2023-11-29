@@ -1,12 +1,11 @@
-import { VK } from "vk-io";
 import { NextMiddleware } from "middleware-io";
-import { ContextDefaultState, MessageContext } from "vk-io";
-import Store from "../store/store";
-import { gracefulStop } from "../helpers/graceful-stop";
+import { ContextDefaultState, MessageContext, VK } from "vk-io";
 import Backend from "../backend/backend";
-import logger from "../helpers/logger";
 import { MessagePayload } from "../backend/models";
 import { loadAttachments } from "../helpers/attachmentsHelper";
+import { gracefulStop } from "../helpers/graceful-stop";
+import logger from "../helpers/logger";
+import Store from "../store/store";
 
 const vkBotLogger = logger.child({}, {
     msgPrefix: 'VkBotShared: ',
@@ -140,5 +139,5 @@ export default class VkBot {
                 return next();
             }
         );
-    }
+    };
 }

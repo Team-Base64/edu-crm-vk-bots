@@ -1,17 +1,17 @@
-import VkBot from "../vk-bot/vk-bot";
-import Store from "../store/store";
 import Backend from "../backend/backend";
+import Store from "../store/store";
+import VkBot from "../vk-bot/vk-bot";
 
-import { SessionManager } from '@vk-io/session';
 import { SceneManager } from '@vk-io/scenes';
+import { SessionManager } from '@vk-io/session';
+import { MessageContext } from "vk-io";
+import logger from "../helpers/logger";
+import { paginatedKeyboard } from "../helpers/pagination";
 import { CommandPatterns } from "./Commands/command-patterns";
+import { ChatLinkButton } from "./Keyboards/chat-link-keyboard";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
 import { AcceptTokenScene } from "./Scenes/accept-token-scene";
 import { customSceneMiddleware } from "./Scenes/custom-scene-middleware";
-import logger from "../helpers/logger";
-import { MessageContext } from "vk-io";
-import { ChatLinkButton, ChatLinkKeyboard } from "./Keyboards/chat-link-keyboard";
-import { paginatedKeyboard } from "../helpers/pagination";
 
 export interface InviteData {
     invite_token: string,
@@ -47,7 +47,7 @@ export class VkMasterBot extends VkBot {
                 command: CommandPatterns.Start,
                 handler: (context) => {
                     return context.send('Привет! Главное меню.', {
-                        keyboard: MainKeyboard.oneTime(),
+                        keyboard: MainKeyboard,
                     });
                 }
             },
@@ -94,7 +94,7 @@ export class VkMasterBot extends VkBot {
         }
 
         const page: number = context.messagePayload.page || 0;
-        
+
         const data = chats.map((id, index) => {
             return { group_id: id, title: `Чат №${index + 1}` };
         });

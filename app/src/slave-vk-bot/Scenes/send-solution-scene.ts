@@ -1,18 +1,19 @@
 import { StepScene } from "@vk-io/scenes";
-import Store from "../../store/store";
 import Backend from "../../backend/backend";
-import { parseAttachments, uploadAttachments } from "../../helpers/attachmentsHelper";
 import { HomeworkPayload } from "../../backend/models";
+import { parseAttachments, uploadAttachments } from "../../helpers/attachmentsHelper";
 import logger from "../../helpers/logger";
 import { paginatedKeyboard } from "../../helpers/pagination";
+import Store from "../../store/store";
 import { HomeworkButton } from "../Keyboards/homeworks-keyboard";
+import { MainKeyboard } from "../Keyboards/main-keyboard";
 
 const sceneLogger = logger.child({}, {
     msgPrefix: 'Scene: ',
 });
 
 const cacheTime = 10; //60 * 5 * 1000; // 5 минут
-const cache = new Map<number, { homeworks: HomeworkPayload[], time: number }>();
+const cache = new Map<number, { homeworks: HomeworkPayload[], time: number; }>();
 
 
 const getHomeworks = async (backend: Backend, class_id: number, page: number): Promise<HomeworkPayload[] | undefined> => {
@@ -34,9 +35,9 @@ const getHomeworks = async (backend: Backend, class_id: number, page: number): P
 
     cache.set(class_id, { homeworks: homeworks, time: Date.now() });
 
-    sceneLogger.debug({homeworks}, 'Cache done');
+    sceneLogger.debug({ homeworks }, 'Cache done');
     return homeworks;
-}
+};
 
 export namespace SendSolutionScene {
     export const name: string = 'solution_scene';
@@ -50,7 +51,7 @@ export namespace SendSolutionScene {
                         context.scene.state.homework_id = hw_id;
                         return context.scene.step.next();
                     }
-                    
+
                     const { class_id } = context.state;
 
                     if (!class_id) {
@@ -58,11 +59,11 @@ export namespace SendSolutionScene {
                         return context.scene.leave();
                     }
 
-                   
+
                     const page = context?.messagePayload?.page || 0;
 
                     const homeworks = await getHomeworks(backend, class_id, page);
-                   
+
                     if (!homeworks) {
                         await context.send('Ошибка получения дз');
                         return context.scene.leave();
@@ -122,12 +123,17 @@ export namespace SendSolutionScene {
                     if (sendError.isError) {
                         await context.send('Ошибка отправки');
                         return context.scene.leave();
+                    } else {
+                        await context.send('Отправлено');
                     }
 
-                    await context.send('Отправлено');
-                    return context.scene.step.next();
+                    await context.send({
+                        message: 'Возврат к обмену сообщениями',
+                        keyboard: MainKeyboard
+                    });
+                    return context.scene.leave();
                 }
             ],
         });
-    }
+    };
 }

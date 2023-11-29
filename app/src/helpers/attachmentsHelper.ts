@@ -1,7 +1,7 @@
 import mime from "mime";
 import { Attachment, AttachmentType, ExternalAttachment, VK } from "vk-io";
-import { changeHttpsToHttp } from "./changeHttpsToHttp";
 import Backend from "../backend/backend";
+import { changeHttpsToHttp } from "./changeHttpsToHttp";
 import logger from "./logger";
 
 interface ParsedAttachment {
@@ -31,7 +31,7 @@ export const parseAttachments = (attachments: (Attachment<{}, string> | External
             // Документ
             case AttachmentType.DOCUMENT: {
                 // url
-                const { url, extension }: { url: string, extension: string } = attachJson;
+                const { url, extension }: { url: string, extension: string; } = attachJson;
 
                 // mimetype
                 const mimetype = mime.getType(extension);
@@ -88,7 +88,7 @@ export const parseAttachments = (attachments: (Attachment<{}, string> | External
     }
 
     return parsedAttachments;
-}
+};
 
 export const uploadAttachments = async (parsedAttachments: ParsedAttachment[], backend: Backend): Promise<string[]> => {
     const internal_urls: string[] = [];
@@ -112,7 +112,7 @@ export const uploadAttachments = async (parsedAttachments: ParsedAttachment[], b
     parserLogger.debug({ internal_urls }, 'Загрузка закончена');
 
     return internal_urls;
-}
+};
 
 export const loadAttachments = async (peer_id: number, vk: VK, files: string[]): Promise<Attachment[]> => {
     const attaches: Attachment[] = [];
@@ -121,7 +121,7 @@ export const loadAttachments = async (peer_id: number, vk: VK, files: string[]):
         const mimetype = mime.getType(file);
 
         if (!mimetype) {
-            loaderLogger.debug({file}, 'Mimetype undefined');
+            loaderLogger.debug({ file }, 'Mimetype undefined');
             continue;
         }
 
@@ -143,12 +143,10 @@ export const loadAttachments = async (peer_id: number, vk: VK, files: string[]):
             try {
                 const doc = await vk.upload.messageDocument({
                     peer_id: peer_id,
-                    title: file.slice(
-                        file.lastIndexOf('/') + 1,
-                        file.lastIndexOf('.')
-                    ),
                     source: {
                         value: file,
+                        filename: file.slice(file.lastIndexOf('/') + 1),
+                        contentType: mimetype
                     },
                 });
                 attaches.push(doc);
@@ -162,4 +160,4 @@ export const loadAttachments = async (peer_id: number, vk: VK, files: string[]):
     }
 
     return attaches;
-}
+};
