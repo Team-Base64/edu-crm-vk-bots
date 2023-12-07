@@ -1,10 +1,10 @@
 import { StepScene } from "@vk-io/scenes";
-import Store from "../../store/store";
+import { randomInt } from "crypto";
+import { VK } from "vk-io";
 import Backend from "../../backend/backend";
 import logger from "../../helpers/logger";
+import Store from "../../store/store";
 import { ChatLinkKeyboard } from "../Keyboards/chat-link-keyboard";
-import { Context, VK } from "vk-io";
-import { randomInt } from "crypto";
 
 const sceneLogger = logger.child({}, {
     msgPrefix: 'AcceptScene: ',
@@ -35,7 +35,7 @@ export namespace AcceptTokenScene {
                 // 2. Проверка токена на бэке
                 async (context) => {
 
-                    const { invite_token } = context.scene.state
+                    const { invite_token } = context.scene.state;
                     if (!invite_token) {
                         sceneLogger.warn('Validate token: Нет токена');
                         await context.send('Что-то пошло не так. Повторите позднее');
@@ -92,7 +92,7 @@ export namespace AcceptTokenScene {
 
                 //4. Получить свободных ботов
                 async (context) => {
-                    // Посмтреть есть ли свободные боты 
+                    // Посмтреть есть ли свободные боты
                     sceneLogger.debug('Ищем свободные боты');
 
                     const { peerId } = context;
@@ -120,7 +120,7 @@ export namespace AcceptTokenScene {
                     return context.scene.step.next();
                 },
 
-                // 5. Посмотреть привязан ли ВК к студенту 
+                // 5. Посмотреть привязан ли ВК к студенту
                 async (context) => {
                     const { peerId } = context;
                     const student_id = await db.getStudentId(peerId);
@@ -135,7 +135,7 @@ export namespace AcceptTokenScene {
                 async (context) => {
                     const this_student_id = context.scene.state.student_id;
 
-                    // ошибка        
+                    // ошибка
                     if (!this_student_id) {
                         sceneLogger.warn(' Ошибка получения профиля');
                         await context.send('Ошибка проверки аккаунта. Повторите позже');
@@ -151,7 +151,7 @@ export namespace AcceptTokenScene {
 
                     const { peerId } = context;
 
-                    // Получаем данные 
+                    // Получаем данные
                     const user = (await vk.api.users.get({ user_ids: [peerId] })).at(0);
 
                     // имя фамилию
@@ -165,7 +165,7 @@ export namespace AcceptTokenScene {
                         type: 'vk',
                     });
 
-                    // Если ошибка 
+                    // Если ошибка
                     if (isError) {
                         sceneLogger.error({ error }, 'Ошибка регистрации');
                         await context.send('Не удалось вас зарегистрировать. Повторите попытку позже');
@@ -192,30 +192,31 @@ export namespace AcceptTokenScene {
                 },
 
                 //7. Создание нового чата
-                async (context) => {
-                    const { class_id, student_id } = context.scene.state;
-                    sceneLogger.debug('Создание чата');
+                // async (context) => {
+                //     const { class_id, student_id } = context.scene.state;
+                //     sceneLogger.debug('Создание чата');
 
-                    const { internal_chat_id, ...createChatError } = await backend.createInternalChat({ class_id: class_id, student_id: student_id });
+                //     const { internal_chat_id, ...createChatError } = await backend.createInternalChat({ class_id: class_id, student_id: student_id });
 
-                    if (createChatError.isError) {
-                        sceneLogger.error(createChatError.error, 'Создание чата ошибка');
-                        await context.send('Не удалось создать чат. Повторите попытку позднее');
+                //     if (createChatError.isError) {
+                //         sceneLogger.error(createChatError.error, 'Создание чата ошибка');
+                //         await context.send('Не удалось создать чат. Повторите попытку позднее');
 
-                        return context.scene.leave();
-                    }
+                //         return context.scene.leave();
+                //     }
 
-                    sceneLogger.debug(internal_chat_id, 'Чат создан');
-                    context.scene.state.internal_chat_id = internal_chat_id;
+                //     sceneLogger.debug(internal_chat_id, 'Чат создан');
+                //     context.scene.state.internal_chat_id = internal_chat_id;
 
-                    return context.scene.step.next();
-                },
+                //     return context.scene.step.next();
+                // },
 
                 // 8. Выбор бота
                 async (context) => {
                     sceneLogger.debug('Выбор бота');
 
-                    const { free_bots, internal_chat_id, class_id } = context.scene.state;
+                    // const { free_bots, internal_chat_id, class_id } = context.scene.state;
+                    const { free_bots, class_id } = context.scene.state;
                     const { peerId } = context;
                     // *тут умный алгоритм*
                     const len = free_bots.length;
@@ -225,7 +226,7 @@ export namespace AcceptTokenScene {
                     // Привязать бота к новому чату
                     sceneLogger.debug('Привязываем бота к чату и классу');
 
-                    const isOk = await db.setChatInfo(peerId, group_id, internal_chat_id, class_id);
+                    const isOk = await db.setChatInfo(peerId, group_id, class_id);
 
                     if (!isOk) {
                         sceneLogger.error('Ошибка привязки');
@@ -246,5 +247,5 @@ export namespace AcceptTokenScene {
                 }
             ],
         });
-    }
+    };
 }
