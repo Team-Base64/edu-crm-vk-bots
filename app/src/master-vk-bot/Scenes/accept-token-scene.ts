@@ -5,6 +5,7 @@ import Backend from "../../backend/backend";
 import logger from "../../helpers/logger";
 import Store from "../../store/store";
 import { ChatLinkKeyboard } from "../Keyboards/chat-link-keyboard";
+import { changeHttpsToHttp } from "../../helpers/changeHttpsToHttp";
 
 const sceneLogger = logger.child({}, {
     msgPrefix: 'AcceptScene: ',
@@ -151,18 +152,34 @@ export namespace AcceptTokenScene {
 
                     const { peerId } = context;
 
+                    // TODO обработка ошибок
+
                     // Получаем данные
-                    const user = (await vk.api.users.get({ user_ids: [peerId] })).at(0);
+                    const user = (await vk.api.users.get({
+                        user_ids: [peerId],
+                        fields: [
+                            'first_name_nom',
+                            'last_name_nom',
+                            'photo_400',
+                        ]
+                    })).at(0);
 
-                    // имя фамилию
-                    const { first_name, last_name } = user;
+                    // имя фамилию аватарку
+                    const { first_name_nom, last_name_nom, photo_400 } = user;
 
-                    sceneLogger.debug({ first_name, last_name }, 'Регистрация');
+                    sceneLogger.debug({ first_name_nom, last_name_nom, photo_400 }, 'Регистрация');
+
+                    const {internalFileURL, ...uploadError} = await backend.uploadAttachment({
+                        fileURL: changeHttpsToHttp(photo_400),
+                        mimetype: 'image/jpeg',
+                    });
+
 
                     // Регаем
                     const { isError, error, student_id } = await backend.createNewStudent({
-                        name: [first_name, last_name].join(' '),
+                        name: [first_name_nom, last_name_nom].join(' '),
                         type: 'vk',
+                        avatarURL: uploadError.isError ? '' : internalFileURL,
                     });
 
                     // Если ошибка
