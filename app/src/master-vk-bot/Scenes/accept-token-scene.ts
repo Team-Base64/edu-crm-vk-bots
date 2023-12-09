@@ -169,17 +169,26 @@ export namespace AcceptTokenScene {
 
                     sceneLogger.debug({ first_name_nom, last_name_nom, photo_400 }, 'Регистрация');
 
-                    const {internalFileURL, ...uploadError} = await backend.uploadAttachment({
-                        fileURL: changeHttpsToHttp(photo_400),
-                        mimetype: 'image/jpeg',
-                    });
+                    let avatarURL = ''
 
+                    try {
+                        const { internalFileURL, ...uploadError } = await backend.uploadAttachment({
+                            fileURL: changeHttpsToHttp(photo_400),
+                            mimetype: 'image/jpeg',
+                        });
+
+                        if(uploadError.isError) throw new Error(uploadError.error);
+
+                        avatarURL = internalFileURL;
+                    } catch (e) {
+                        sceneLogger.warn(e, 'Ошибка при загрузке аватарки, мб её нет?');
+                    }
 
                     // Регаем
                     const { isError, error, student_id } = await backend.createNewStudent({
                         name: [first_name_nom, last_name_nom].join(' '),
                         type: 'vk',
-                        avatarURL: uploadError.isError ? '' : internalFileURL,
+                        avatarURL: avatarURL,
                     });
 
                     // Если ошибка
