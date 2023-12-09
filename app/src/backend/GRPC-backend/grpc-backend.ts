@@ -156,12 +156,12 @@ export default class GRPCBackend implements Backend {
 
     public async createNewStudent(payload: CreateStudentPayload): Promise<CreateStudentResult> {
         backendLogger.debug(payload, 'Backend start create student');
-        const { name, type } = payload;
+        const { name, type, avatarURL } = payload;
 
         const req = new CreateStudentRequest();
         req.setName(name);
         req.setType(type);
-        req.setAvatarurl(''); // TODO
+        req.setAvatarurl(avatarURL);
 
         return new Promise((resolve) => {
             this.client.createStudent(req, (err, resp) => {

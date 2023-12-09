@@ -33,6 +33,7 @@ export type SocialNetworkType = 'tg' | 'vk';
 export type CreateStudentPayload = {
     name: string;
     type: SocialNetworkType;
+    avatarURL: string;
 };
 
 export type CreateChatPayload = {
