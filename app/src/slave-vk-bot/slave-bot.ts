@@ -139,6 +139,8 @@ export default class VkSlaveBot extends VkBot {
         const { peerId } = context;
         const { group_id } = this;
 
+        slaveBotLogger.debug({peerId, group_id}, 'Проверка авторизации');
+
         // Проверить что пользователь привязан к боту и чату в crm
         // Получить из базы chat_id
         const chatData = await this.db.getChatInfo(peerId, group_id);
@@ -158,7 +160,6 @@ export default class VkSlaveBot extends VkBot {
 
         // Создать чат, если его ещё нет (первое сообщение)
         if (chatData.internal_chat_id === null) {
-            console.log(chatData.internal_chat_id);
             const { internal_chat_id, ...createChatError } = await this.backend.createInternalChat({
                 class_id: chatData.class_id,
                 student_id
@@ -176,6 +177,7 @@ export default class VkSlaveBot extends VkBot {
             chatData.internal_chat_id = internal_chat_id;
         }
 
+        slaveBotLogger.debug({peerId, group_id, chatData, student_id}, 'Авторизация ОК');
 
         context.state = { ...context.state, ...chatData, student_id };
         return next();

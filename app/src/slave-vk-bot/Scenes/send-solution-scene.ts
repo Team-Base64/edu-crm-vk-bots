@@ -9,7 +9,7 @@ import { HomeworkButton } from "../Keyboards/homeworks-keyboard";
 import { MainKeyboard } from "../Keyboards/main-keyboard";
 
 const sceneLogger = logger.child({}, {
-    msgPrefix: 'Scene: ',
+    msgPrefix: 'Сцена отправки решения: ',
 });
 
 const cacheTime = 10; //60 * 5 * 1000; // 5 минут
@@ -17,25 +17,22 @@ const cache = new Map<number, { homeworks: HomeworkPayload[], time: number; }>()
 
 
 const getHomeworks = async (backend: Backend, class_id: number, page: number): Promise<HomeworkPayload[] | undefined> => {
-    sceneLogger.debug('Cache');
     const cached = cache.get(class_id);
 
     if (cached && cached.time + cacheTime > Date.now()) {
-        sceneLogger.debug('Cached');
+        sceneLogger.debug('Достаём дз из кэша');
         return cached.homeworks;
     }
 
-    sceneLogger.debug('Not cached');
     const { homeworks, ...homeworksError } = await backend.getClassHomeworks({ class_id: class_id });
 
     if (homeworksError.isError) {
-        sceneLogger.debug('Cache get error');
+        sceneLogger.debug('Ошибка обновления кэша ДЗ');
         return undefined;
     }
 
     cache.set(class_id, { homeworks: homeworks, time: Date.now() });
 
-    sceneLogger.debug({ homeworks }, 'Cache done');
     return homeworks;
 };
 
@@ -90,8 +87,8 @@ export namespace SendSolutionScene {
                         return context.send('Отправьте решение');
                     }
 
-                    const { homework_id } = context.scene.state;
-                    const { stundent_id } = context.state;
+                    const  homework_id  = context.scene.state.homework_id;
+                    const stundent_id  = context.state.student_id;
                     if (!homework_id || !stundent_id) {
                         sceneLogger.warn({homework_id, stundent_id} , 'Неверный контекст');
                         await context.send('Что-то пошло не так');
