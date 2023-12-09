@@ -34,6 +34,31 @@ export namespace Message {
     }
 }
 
+export class TaskData extends jspb.Message { 
+    getDescription(): string;
+    setDescription(value: string): TaskData;
+    clearAttachmenturlsList(): void;
+    getAttachmenturlsList(): Array<string>;
+    setAttachmenturlsList(value: Array<string>): TaskData;
+    addAttachmenturls(value: string, index?: number): string;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): TaskData.AsObject;
+    static toObject(includeInstance: boolean, msg: TaskData): TaskData.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: TaskData, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): TaskData;
+    static deserializeBinaryFromReader(message: TaskData, reader: jspb.BinaryReader): TaskData;
+}
+
+export namespace TaskData {
+    export type AsObject = {
+        description: string,
+        attachmenturlsList: Array<string>,
+    }
+}
+
 export class HomeworkData extends jspb.Message { 
     getHomeworkid(): number;
     setHomeworkid(value: number): HomeworkData;
@@ -41,10 +66,10 @@ export class HomeworkData extends jspb.Message {
     setTitle(value: string): HomeworkData;
     getDescription(): string;
     setDescription(value: string): HomeworkData;
-    clearAttachmenturlsList(): void;
-    getAttachmenturlsList(): Array<string>;
-    setAttachmenturlsList(value: Array<string>): HomeworkData;
-    addAttachmenturls(value: string, index?: number): string;
+    clearTasksList(): void;
+    getTasksList(): Array<TaskData>;
+    setTasksList(value: Array<TaskData>): HomeworkData;
+    addTasks(value?: TaskData, index?: number): TaskData;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): HomeworkData.AsObject;
@@ -61,7 +86,7 @@ export namespace HomeworkData {
         homeworkid: number,
         title: string,
         description: string,
-        attachmenturlsList: Array<string>,
+        tasksList: Array<TaskData.AsObject>,
     }
 }
 

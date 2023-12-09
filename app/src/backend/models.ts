@@ -1,9 +1,9 @@
-export type ServerMessageToSlaveHandler = (payload : MessagePayload) => Promise<any>;
+export type ServerMessageToSlaveHandler = (payload: MessagePayload) => Promise<any>;
 
 export type BackendError = {
-    isError ?: boolean;
-    error ?: string;
-}
+    isError?: boolean;
+    error?: string;
+};
 
 export type MessagePayload = {
     internal_chat_id: number;
@@ -11,11 +11,16 @@ export type MessagePayload = {
     attachmentURLs: string[];
 };
 
+export type TaskPayload = {
+    description: string;
+    attachmentURLs: string[];
+};
+
 export type HomeworkPayload = {
     homework_id: number;
     title: string;
     description: string;
-    attachmentURLs: string[];
+    tasks: TaskPayload[];
 };
 
 export type SolutionPayload = {
@@ -33,27 +38,28 @@ export type SocialNetworkType = 'tg' | 'vk';
 export type CreateStudentPayload = {
     name: string;
     type: SocialNetworkType;
+    avatarURL: string;
 };
 
 export type CreateChatPayload = {
     student_id: number;
     class_id: number;
-}
+};
 
 export type GetHomeworksPayload = {
     class_id: number;
-}
+};
 
 export type SendSolutionPayload = {
-    student_id : number;
+    student_id: number;
     homework_id: number;
     solution: SolutionPayload;
-}
+};
 
 export type FileUploadPayload = {
     mimetype: string;
     fileURL: string;
-}
+};
 
 // Responses
 

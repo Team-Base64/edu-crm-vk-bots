@@ -4,7 +4,7 @@ import grpc from "@grpc/grpc-js";
 import logger from "../../helpers/logger";
 import { BotChatClient } from "./model_grpc_pb";
 //const grpc = require('@grpc/grpc-js');
-import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
+import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, TaskPayload, ValidateTokenPayload, ValidateTokenResult } from "../models";
 import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as GRPCMessage, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
 
 import { gracefulStop } from "../../helpers/graceful-stop";
@@ -120,11 +120,19 @@ export default class GRPCBackend implements Backend {
                 const homeworks: HomeworkPayload[] = resp
                     .getHomeworksList()
                     .map((hw): HomeworkPayload => {
+                        const tasks = hw.getTasksList().map<TaskPayload>(
+                            task => {
+                                return {
+                                    description: task.getDescription(),
+                                    attachmentURLs: task.getAttachmenturlsList()
+                                };
+                            }
+                        );
                         return {
                             homework_id: hw.getHomeworkid(),
                             title: hw.getTitle(),
                             description: hw.getDescription(),
-                            attachmentURLs: hw.getAttachmenturlsList(),
+                            tasks
                         };
                     });
                 backendLogger.debug({ homeworks }, 'Backend get homeworks done');
@@ -156,12 +164,12 @@ export default class GRPCBackend implements Backend {
 
     public async createNewStudent(payload: CreateStudentPayload): Promise<CreateStudentResult> {
         backendLogger.debug(payload, 'Backend start create student');
-        const { name, type } = payload;
+        const { name, type, avatarURL } = payload;
 
         const req = new CreateStudentRequest();
         req.setName(name);
         req.setType(type);
-        req.setAvatarurl(''); // TODO
+        req.setAvatarurl(avatarURL);
 
         return new Promise((resolve) => {
             this.client.createStudent(req, (err, resp) => {

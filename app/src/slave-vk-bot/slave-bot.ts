@@ -149,14 +149,35 @@ export default class VkSlaveBot extends VkBot {
         }
 
         // Получить stundent_id;
-        const stundent_id = await this.db.getStudentId(peerId);
+        const student_id = await this.db.getStudentId(peerId);
 
-        if (!stundent_id) {
+        if (!student_id) {
             slaveBotLogger.debug({ peerId, group_id }, 'Vk user is not linked to student');
             return context.send("Не удалось загрузить ваш профиль. повторите позднее", { peer_id: peerId });
         }
 
-        context.state = { ...context.state, ...chatData, stundent_id };
+        // Создать чат, если его ещё нет (первое сообщение)
+        if (chatData.internal_chat_id === null) {
+            console.log(chatData.internal_chat_id);
+            const { internal_chat_id, ...createChatError } = await this.backend.createInternalChat({
+                class_id: chatData.class_id,
+                student_id
+            });
+
+            if (createChatError.isError) {
+                slaveBotLogger.debug({ peerId, group_id }, 'Error creating chat');
+                return context.send('Не удалось создать чат. Повторите попытку позднее');
+            }
+
+            if (!await this.db.updateChatIds(internal_chat_id, peerId, group_id)) {
+                slaveBotLogger.debug({ peerId, group_id }, 'Error update chat id');
+                return context.send('Не удалось создать чат. Повторите попытку позднее');
+            }
+            chatData.internal_chat_id = internal_chat_id;
+        }
+
+
+        context.state = { ...context.state, ...chatData, student_id };
         return next();
     }
 
