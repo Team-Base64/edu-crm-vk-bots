@@ -1,9 +1,9 @@
 import { Client } from "pg";
 import { gracefulStop } from "../../helpers/graceful-stop";
-import Backend from "../backend";
 import logger from "../../helpers/logger";
-import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
 import postgres_config from "../../store/PostrgeSQL/config";
+import Backend from "../backend";
+import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
 
 const backendLogger = logger.child({}, {
     msgPrefix: 'MOCKbackend'
@@ -169,13 +169,13 @@ class BackendMock implements Backend {
                 }
 
                 const hws: HomeworkPayload[] = data.rows.map((row) => {
-                    const attaches: string[] = row.attaches.map((a: any) => String(a));
+                    // const attaches: string[] = row.attaches.map((a: any) => String(a));
 
                     return {
                         homework_id: Number(row.id),
                         title: String(row.title),
                         description: String(row.descr),
-                        attachmentURLs: attaches,
+                        tasks: []
                     };
                 });
 
