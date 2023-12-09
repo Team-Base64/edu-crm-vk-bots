@@ -93,6 +93,7 @@ export namespace SendSolutionScene {
                     const { homework_id } = context.scene.state;
                     const { stundent_id } = context.state;
                     if (!homework_id || !stundent_id) {
+                        sceneLogger.warn({homework_id, stundent_id} , 'Неверный контекст');
                         await context.send('Что-то пошло не так');
                         return context.scene.leave();
                     }
