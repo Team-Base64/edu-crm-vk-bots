@@ -1,7 +1,5 @@
 import { Keyboard } from "vk-io";
 import { HomeworkPayload } from "../../backend/models";
-import { paginate } from "../../helpers/pagination";
-import logger from "../../helpers/logger";
 
 const hwsOnPage = 4;
 
@@ -13,4 +11,4 @@ export const HomeworkButton = (homework: HomeworkPayload) => {
         },
         color: "primary",
     });
-}
+};

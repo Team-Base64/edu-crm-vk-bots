@@ -4,7 +4,7 @@ package chat;
 
 option go_package = "./chat";
 
-// Models 
+// Models
 
 message Message {
     int32 chatID = 1;
@@ -12,11 +12,16 @@ message Message {
     repeated string attachmentURLs = 3;
 }
 
+message TaskData {
+    string description = 1;
+    repeated string attachmentURLs = 2;
+}
+
 message HomeworkData {
     int32 homeworkID = 1;
     string title = 2;
     string description = 3;
-    repeated string attachmentURLs = 4;
+    repeated TaskData tasks = 4;
 }
 
 message SolutionData {
@@ -25,7 +30,7 @@ message SolutionData {
 }
 
 
-// Requests 
+// Requests
 message ValidateTokenRequest {
     string token = 1;
 }
@@ -56,7 +61,7 @@ message FileUploadRequest {
     string fileURL = 2;
 }
 
-// Responses 
+// Responses
 
 message ValidateTokenResponse {
     int32 classID = 1;
@@ -82,7 +87,7 @@ message FileUploadResponse {
     string internalFileURL = 1;
 }
 
-service BotChat { 
+service BotChat {
     rpc StartChatVK(stream Message) returns (stream Message);
 
     rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
@@ -94,9 +99,9 @@ service BotChat {
 }
 
 
-// ПОТОМ 
+// ПОТОМ
 
-    // ПОтом 
+    // ПОтом
     // rpc startNotification() returns (stream Event);
 // message Event {
 //     oneof payload {
