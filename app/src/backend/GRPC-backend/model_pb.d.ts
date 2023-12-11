@@ -115,6 +115,38 @@ export namespace SolutionData {
     }
 }
 
+export class EventData extends jspb.Message { 
+    getId(): string;
+    setId(value: string): EventData;
+    getTitle(): string;
+    setTitle(value: string): EventData;
+    getDescription(): string;
+    setDescription(value: string): EventData;
+    getStartdate(): string;
+    setStartdate(value: string): EventData;
+    getEnddate(): string;
+    setEnddate(value: string): EventData;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): EventData.AsObject;
+    static toObject(includeInstance: boolean, msg: EventData): EventData.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: EventData, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): EventData;
+    static deserializeBinaryFromReader(message: EventData, reader: jspb.BinaryReader): EventData;
+}
+
+export namespace EventData {
+    export type AsObject = {
+        id: string,
+        title: string,
+        description: string,
+        startdate: string,
+        enddate: string,
+    }
+}
+
 export class ValidateTokenRequest extends jspb.Message { 
     getToken(): string;
     setToken(value: string): ValidateTokenRequest;
@@ -256,6 +288,26 @@ export namespace FileUploadRequest {
     }
 }
 
+export class GetEventsRequest extends jspb.Message { 
+    getClassid(): number;
+    setClassid(value: number): GetEventsRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): GetEventsRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: GetEventsRequest): GetEventsRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: GetEventsRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): GetEventsRequest;
+    static deserializeBinaryFromReader(message: GetEventsRequest, reader: jspb.BinaryReader): GetEventsRequest;
+}
+
+export namespace GetEventsRequest {
+    export type AsObject = {
+        classid: number,
+    }
+}
+
 export class ValidateTokenResponse extends jspb.Message { 
     getClassid(): number;
     setClassid(value: number): ValidateTokenResponse;
@@ -372,5 +424,27 @@ export class FileUploadResponse extends jspb.Message {
 export namespace FileUploadResponse {
     export type AsObject = {
         internalfileurl: string,
+    }
+}
+
+export class GetEventsResponse extends jspb.Message { 
+    clearEventsList(): void;
+    getEventsList(): Array<EventData>;
+    setEventsList(value: Array<EventData>): GetEventsResponse;
+    addEvents(value?: EventData, index?: number): EventData;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): GetEventsResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: GetEventsResponse): GetEventsResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: GetEventsResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): GetEventsResponse;
+    static deserializeBinaryFromReader(message: GetEventsResponse, reader: jspb.BinaryReader): GetEventsResponse;
+}
+
+export namespace GetEventsResponse {
+    export type AsObject = {
+        eventsList: Array<EventData.AsObject>,
     }
 }

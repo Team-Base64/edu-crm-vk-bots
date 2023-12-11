@@ -1,5 +1,5 @@
 import { NextMiddleware } from "middleware-io";
-import { ContextDefaultState, MessageContext } from "vk-io";
+import { ContextDefaultState, Keyboard, MessageContext } from "vk-io";
 import Backend from "../backend/backend";
 import logger from "../helpers/logger";
 import Store from "../store/store";
@@ -11,6 +11,7 @@ import { parseAttachments, uploadAttachments } from "../helpers/attachmentsHelpe
 import { CommandPatterns } from "./Commands/command-patterns";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
 import { SendSolutionScene } from "./Scenes/send-solution-scene";
+import { SheduleEventKeyboard } from "./Keyboards/shedule-event-keyboard";
 
 const slaveBotLogger = logger.child({}, {
     msgPrefix: 'SlaveVkBot: '
@@ -89,12 +90,74 @@ export default class VkSlaveBot extends VkBot {
                         '- Не прикрепляйте более 3 файлов или фоток. Скорее всего ничего не отправится (('
                     );
                 }
+            },
+            {
+                command: CommandPatterns.Shedule,
+                handler: this.handleGetShedule.bind(this),
             }
         ]);
 
         // this.vk.updates.on('message_new', customSceneMiddleware);
 
         this.vk.updates.on('message_new', this.messageMiddleware.bind(this));
+    }
+
+    private async handleGetShedule(context: MessageContext) {
+        const { class_id } = context.state;
+        slaveBotLogger.debug({ class_id }, 'Обработка получения эвентов')
+        if (!class_id) {
+            slaveBotLogger.error('Получение эвентов: class_id === null');
+            return context.send('Произошла ошибка, повторите позднее');
+        }
+
+        const { isError, error, events } = await this.backend.getClassEvents({
+            classID: class_id
+        });
+
+        if (isError) {
+            slaveBotLogger.error(error, 'Ошибка получения эвентов');
+            return context.send('Произошла ошибка, повторите позднее');
+        }
+
+        if (!events.length) {
+            return context.send('В этом классе занятия пока не запланированы');
+        }
+
+        await context.send('Ваше расписание:');
+
+        events.forEach(async (event, index) => {
+            const stastISOms = Date.parse(event.startDateISO);
+            const endISOms = Date.parse(event.endDateISO);
+
+            const durationTotalMin = (endISOms - stastISOms) / (1000 * 60);
+            const durationH = Math.floor(durationTotalMin / 60);
+            const durationM = durationTotalMin % 60;
+            const duration =
+                (durationH < 10 ? '0' : '')
+                +
+                durationH
+                +
+                ':'
+                +
+                (durationM < 10 ? '0' : '')
+                +
+                durationM
+                ;
+
+            const offsetMin = new Date(stastISOms).getTimezoneOffset();
+
+            const start = new Date(stastISOms + (offsetMin + 3 * 60 /*MSK +3 h*/) * 60 * 1000).toLocaleString('ru-RU').slice(0, -3).replace(',', ' в');
+            await context.send({
+                message: `${index + 1}: ${event.title || 'Без заголовка'}
+Начало: ${start} по МСК
+Продолжительность: ${duration}
+Описание:\n${event.description || 'Без описания'}
+                `,
+                // keyboard: SheduleEventKeyboard(event).inline(),
+            })
+        });
+
+        return;
     }
 
     private async handleSendSolution(context: MessageContext) {
@@ -139,7 +202,7 @@ export default class VkSlaveBot extends VkBot {
         const { peerId } = context;
         const { group_id } = this;
 
-        slaveBotLogger.debug({peerId, group_id}, 'Проверка авторизации');
+        slaveBotLogger.debug({ peerId, group_id }, 'Проверка авторизации');
 
         // Проверить что пользователь привязан к боту и чату в crm
         // Получить из базы chat_id
@@ -177,7 +240,7 @@ export default class VkSlaveBot extends VkBot {
             chatData.internal_chat_id = internal_chat_id;
         }
 
-        slaveBotLogger.debug({peerId, group_id, chatData, student_id}, 'Авторизация ОК');
+        slaveBotLogger.debug({ peerId, group_id, chatData, student_id }, 'Авторизация ОК');
 
         context.state = { ...context.state, ...chatData, student_id };
         return next();

@@ -70,6 +70,28 @@ function deserialize_chat_FileUploadResponse(buffer_arg) {
   return model_pb.FileUploadResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_chat_GetEventsRequest(arg) {
+  if (!(arg instanceof model_pb.GetEventsRequest)) {
+    throw new Error('Expected argument of type chat.GetEventsRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_chat_GetEventsRequest(buffer_arg) {
+  return model_pb.GetEventsRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_chat_GetEventsResponse(arg) {
+  if (!(arg instanceof model_pb.GetEventsResponse)) {
+    throw new Error('Expected argument of type chat.GetEventsResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_chat_GetEventsResponse(buffer_arg) {
+  return model_pb.GetEventsResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_chat_GetHomeworksRequest(arg) {
   if (!(arg instanceof model_pb.GetHomeworksRequest)) {
     throw new Error('Expected argument of type chat.GetHomeworksRequest');
@@ -225,6 +247,17 @@ var BotChatService = exports.BotChatService = {
     requestDeserialize: deserialize_chat_SendSolutionRequest,
     responseSerialize: serialize_chat_SendSolutionResponse,
     responseDeserialize: deserialize_chat_SendSolutionResponse,
+  },
+  getEvents: {
+    path: '/chat.BotChat/GetEvents',
+    requestStream: false,
+    responseStream: false,
+    requestType: model_pb.GetEventsRequest,
+    responseType: model_pb.GetEventsResponse,
+    requestSerialize: serialize_chat_GetEventsRequest,
+    requestDeserialize: deserialize_chat_GetEventsRequest,
+    responseSerialize: serialize_chat_GetEventsResponse,
+    responseDeserialize: deserialize_chat_GetEventsResponse,
   },
 };
 

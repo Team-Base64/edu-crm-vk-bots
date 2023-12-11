@@ -4,15 +4,17 @@ import grpc from "@grpc/grpc-js";
 import logger from "../../helpers/logger";
 import { BotChatClient } from "./model_grpc_pb";
 //const grpc = require('@grpc/grpc-js');
-import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, TaskPayload, ValidateTokenPayload, ValidateTokenResult } from "../models";
-import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as GRPCMessage, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
+import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetEventsPayload, GetEventsResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, TaskPayload, ValidateTokenPayload, ValidateTokenResult } from "../models";
+import { CreateChatRequest, CreateStudentRequest, EventData, FileUploadRequest, Message as GRPCMessage, GetEventsRequest, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
 
 import { gracefulStop } from "../../helpers/graceful-stop";
 import client from "./config";
 
 const streamReconnectTimeout = 3;
 
-const backendLogger = logger.child({ class: 'GRPCbackend' });
+const backendLogger = logger.child({}, {
+    msgPrefix: 'GRPC backend: ',
+});
 
 export default class GRPCBackend implements Backend {
     private client: BotChatClient;
@@ -245,5 +247,34 @@ export default class GRPCBackend implements Backend {
 
     public addHandleMessageFromServerToSlave(handler: ServerMessageToSlaveHandler): void {
         this.toSlaveHandlers.push(handler);
+    }
+
+    public getClassEvents(payload: GetEventsPayload): Promise<GetEventsResult> {
+        backendLogger.debug(payload, 'Получение эвентов началось');
+        const { classID } = payload;
+
+        const req = new GetEventsRequest();
+        req.setClassid(classID);
+
+        return new Promise((resolve) => {
+            this.client.getEvents(req, (err, resp) => {
+                if (err) {
+                    backendLogger.error(err, 'Ошибка получения эвентов ');
+                    return resolve({ isError: true, error: err.message, events: [] });
+                }
+
+                return resolve({
+                    events: resp
+                        .getEventsList()
+                        .map(e => ({
+                            title: e.getTitle(),
+                            description: e.getDescription(),
+                            startDateISO: e.getStartdate(),
+                            endDateISO: e.getEnddate(),
+                            uuid: e.getId(),
+                        })),
+                });
+            });
+        });
     }
 }

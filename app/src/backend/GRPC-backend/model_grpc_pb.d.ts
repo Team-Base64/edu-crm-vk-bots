@@ -15,6 +15,7 @@ interface IBotChatService extends grpc.ServiceDefinition<grpc.UntypedServiceImpl
     uploadFile: IBotChatService_IUploadFile;
     createStudent: IBotChatService_ICreateStudent;
     sendSolution: IBotChatService_ISendSolution;
+    getEvents: IBotChatService_IGetEvents;
 }
 
 interface IBotChatService_IStartChatVK extends grpc.MethodDefinition<model_pb.Message, model_pb.Message> {
@@ -80,6 +81,15 @@ interface IBotChatService_ISendSolution extends grpc.MethodDefinition<model_pb.S
     responseSerialize: grpc.serialize<model_pb.SendSolutionResponse>;
     responseDeserialize: grpc.deserialize<model_pb.SendSolutionResponse>;
 }
+interface IBotChatService_IGetEvents extends grpc.MethodDefinition<model_pb.GetEventsRequest, model_pb.GetEventsResponse> {
+    path: "/chat.BotChat/GetEvents";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<model_pb.GetEventsRequest>;
+    requestDeserialize: grpc.deserialize<model_pb.GetEventsRequest>;
+    responseSerialize: grpc.serialize<model_pb.GetEventsResponse>;
+    responseDeserialize: grpc.deserialize<model_pb.GetEventsResponse>;
+}
 
 export const BotChatService: IBotChatService;
 
@@ -91,6 +101,7 @@ export interface IBotChatServer extends grpc.UntypedServiceImplementation {
     uploadFile: grpc.handleUnaryCall<model_pb.FileUploadRequest, model_pb.FileUploadResponse>;
     createStudent: grpc.handleUnaryCall<model_pb.CreateStudentRequest, model_pb.CreateStudentResponse>;
     sendSolution: grpc.handleUnaryCall<model_pb.SendSolutionRequest, model_pb.SendSolutionResponse>;
+    getEvents: grpc.handleUnaryCall<model_pb.GetEventsRequest, model_pb.GetEventsResponse>;
 }
 
 export interface IBotChatClient {
@@ -115,6 +126,9 @@ export interface IBotChatClient {
     sendSolution(request: model_pb.SendSolutionRequest, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
     sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
     sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
+    getEvents(request: model_pb.GetEventsRequest, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
+    getEvents(request: model_pb.GetEventsRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
+    getEvents(request: model_pb.GetEventsRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
 }
 
 export class BotChatClient extends grpc.Client implements IBotChatClient {
@@ -139,4 +153,7 @@ export class BotChatClient extends grpc.Client implements IBotChatClient {
     public sendSolution(request: model_pb.SendSolutionRequest, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
     public sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
     public sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
+    public getEvents(request: model_pb.GetEventsRequest, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
+    public getEvents(request: model_pb.GetEventsRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
+    public getEvents(request: model_pb.GetEventsRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
 }

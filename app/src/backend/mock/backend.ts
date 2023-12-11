@@ -3,7 +3,7 @@ import { gracefulStop } from "../../helpers/graceful-stop";
 import logger from "../../helpers/logger";
 import postgres_config from "../../store/PostrgeSQL/config";
 import Backend from "../backend";
-import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
+import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetEventsPayload, GetEventsResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, ValidateTokenPayload, ValidateTokenResult } from "../models";
 
 const backendLogger = logger.child({}, {
     msgPrefix: 'MOCKbackend'
@@ -17,6 +17,19 @@ class BackendMock implements Backend {
         this.db = new Client(postgres_config);
         this.toSlaveHandler = [];
         gracefulStop(this.stop.bind(this));
+    }
+    public getClassEvents(payload: GetEventsPayload): Promise<GetEventsResult> {
+        return new Promise((res) => {
+            return res({
+                events: [{
+                    title: 'title',
+                    description: 'desccr',
+                    uuid: 'dwdwd',
+                    startDateISO: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+                    endDateISO: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
+                }]
+            })
+        });
     }
 
     public async validateInviteToken(payload: ValidateTokenPayload): Promise<ValidateTokenResult> {

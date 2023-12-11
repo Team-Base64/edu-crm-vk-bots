@@ -29,6 +29,13 @@ message SolutionData {
     repeated string attachmentURLs = 2;
 }
 
+message EventData {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    string startDate = 4;
+    string endDate = 5;
+}
 
 // Requests
 message ValidateTokenRequest {
@@ -61,6 +68,10 @@ message FileUploadRequest {
     string fileURL = 2;
 }
 
+message GetEventsRequest {
+    int32 classID = 1;
+}
+
 // Responses
 
 message ValidateTokenResponse {
@@ -87,6 +98,10 @@ message FileUploadResponse {
     string internalFileURL = 1;
 }
 
+message GetEventsResponse {
+    repeated EventData events = 1;
+}
+
 service BotChat {
     rpc StartChatVK(stream Message) returns (stream Message);
 
@@ -96,6 +111,7 @@ service BotChat {
     rpc UploadFile (FileUploadRequest) returns (FileUploadResponse);
     rpc CreateStudent(CreateStudentRequest) returns (CreateStudentResponse);
     rpc SendSolution (SendSolutionRequest) returns (SendSolutionResponse);
+    rpc GetEvents (GetEventsRequest) returns (GetEventsResponse);
 }
 
 

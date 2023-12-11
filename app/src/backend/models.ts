@@ -28,6 +28,14 @@ export type SolutionPayload = {
     attachmentURLs: string[];
 };
 
+export type EventPayload = {
+    uuid: string;
+    title: string;
+    description: string;
+    startDateISO: string;
+    endDateISO: string;
+}
+
 // Requests
 export type ValidateTokenPayload = {
     token: string;
@@ -61,6 +69,10 @@ export type FileUploadPayload = {
     fileURL: string;
 };
 
+export type GetEventsPayload = {
+    classID: number;
+}
+
 // Responses
 
 export interface ValidateTokenResult extends BackendError {
@@ -85,4 +97,8 @@ export interface SendSolutionResult extends BackendError {
 
 export interface FileUploadResult extends BackendError {
     internalFileURL: string;
+}
+
+export interface GetEventsResult extends BackendError {
+    events: EventPayload[];
 }

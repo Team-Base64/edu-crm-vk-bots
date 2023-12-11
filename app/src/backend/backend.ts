@@ -2,9 +2,12 @@
 // TODO! Как понять какому пользователю мастер отправляет сообщение?
 // export type ServerMessageToMasterHandler = (internal_chat_id: number, text: string) => Promise<any>;
 
-import { ValidateTokenPayload, ValidateTokenResult, CreateChatPayload, CreateChatResult, GetHomeworksPayload, GetHomeworksResult, FileUploadPayload, FileUploadResult, CreateStudentPayload, CreateStudentResult, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, MessagePayload } from "./models";
+import { ValidateTokenPayload, ValidateTokenResult, CreateChatPayload, CreateChatResult, GetHomeworksPayload, GetHomeworksResult, FileUploadPayload, FileUploadResult, CreateStudentPayload, CreateStudentResult, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, MessagePayload, GetEventsPayload, GetEventsResult } from "./models";
 
 export default abstract class Backend {
+    // Получение расписания 
+    public abstract getClassEvents(payload: GetEventsPayload)  : Promise<GetEventsResult>;
+    
     // Проверка токена на валидность
     public abstract validateInviteToken(payload: ValidateTokenPayload): Promise<ValidateTokenResult>;
 

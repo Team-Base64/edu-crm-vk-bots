@@ -15,5 +15,13 @@ export const MainKeyboard = Keyboard.builder()
             command: '/homeworks'
         },
         color: "secondary",
-    });
+    })
+    .row()
+    .textButton({
+        label: 'Расписание',
+        payload: {
+            command: '/shedule'
+        },
+        color: "secondary"
+    })
 // .oneTime();
