@@ -188,7 +188,21 @@ class BackendMock implements Backend {
                         homework_id: Number(row.id),
                         title: String(row.title),
                         description: String(row.descr),
-                        tasks: []
+                        tasks: [
+                            {
+                                description: 'Супер пупер задача 1',
+                                attachmentURLs: [
+                                    'https://kartin.papik.pro/uploads/posts/2023-06/1686810876_kartin-papik-pro-p-kartinki-plokhogo-kachestva-priroda-66.jpg',
+                                    'https://kartin.papik.pro/uploads/posts/2023-06/1686810868_kartin-papik-pro-p-kartinki-plokhogo-kachestva-priroda-45.jpg',
+                                ]
+                            },
+                            {
+                                description: 'Супер пупер задача 2',
+                                attachmentURLs: [
+                                    'https://kartin.papik.pro/uploads/posts/2023-06/1686810870_kartin-papik-pro-p-kartinki-plokhogo-kachestva-priroda-51.jpg',
+                                ]
+                            }
+                        ]
                     };
                 });
 

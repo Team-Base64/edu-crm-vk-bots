@@ -1,5 +1,5 @@
 import { NextMiddleware } from "middleware-io";
-import { ContextDefaultState, Keyboard, MessageContext } from "vk-io";
+import { ContextDefaultState, MessageContext } from "vk-io";
 import Backend from "../backend/backend";
 import logger from "../helpers/logger";
 import Store from "../store/store";
@@ -7,11 +7,13 @@ import VkBot from "../vk-bot/vk-bot";
 
 import { SceneManager } from "@vk-io/scenes";
 import { SessionManager } from "@vk-io/session";
-import { parseAttachments, uploadAttachments } from "../helpers/attachmentsHelper";
+import { loadAttachments, parseAttachments, uploadAttachments } from "../helpers/attachmentsHelper";
 import { CommandPatterns } from "./Commands/command-patterns";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
 import { SendSolutionScene } from "./Scenes/send-solution-scene";
 import { SheduleEventKeyboard } from "./Keyboards/shedule-event-keyboard";
+import { HomeworkActionsKeyboard } from "./Keyboards/homework-item-keyboard";
+import { HomeworkPayload } from "../backend/models";
 
 const slaveBotLogger = logger.child({}, {
     msgPrefix: 'SlaveVkBot: '
@@ -94,7 +96,11 @@ export default class VkSlaveBot extends VkBot {
             {
                 command: CommandPatterns.Shedule,
                 handler: this.handleGetShedule.bind(this),
-            }
+            },
+            {
+                command: CommandPatterns.Tasks,
+                handler: this.handleGetTasks.bind(this),
+            },
         ]);
 
         // this.vk.updates.on('message_new', customSceneMiddleware);
@@ -104,7 +110,7 @@ export default class VkSlaveBot extends VkBot {
 
     private async handleGetShedule(context: MessageContext) {
         const { class_id } = context.state;
-        slaveBotLogger.debug({ class_id }, 'Обработка получения эвентов')
+        slaveBotLogger.debug({ class_id }, 'Обработка получения эвентов');
         if (!class_id) {
             slaveBotLogger.error('Получение эвентов: class_id === null');
             return context.send('Произошла ошибка, повторите позднее');
@@ -164,38 +170,98 @@ export default class VkSlaveBot extends VkBot {
         context.scene.enter(SendSolutionScene.name);
     }
 
-    private async handleGetHomeworks(context: MessageContext<ContextDefaultState>) {
+    private async handleGetTasks(context: MessageContext) {
         const { peerId } = context;
+        const hwID = context?.messagePayload?.homework_id;
 
-        const resp = await this.db.getChatInfo(peerId, this.group_id);
-        if (!resp) {
-            slaveBotLogger.warn({ peerId }, 'Get internal chat id error');
-            return;
+        if (!hwID) {
+            slaveBotLogger.error('Получение задач, нет HW ID');
+            return context.send('Ошибка получения полного дз');
         }
 
-        const { class_id } = resp;
+        const { isError, homeworks } = await this.getHomeworks(context);
+
+        if (isError) {
+            return context.send('Ошибка получения полного дз');
+        }
+
+
+        const hw = homeworks.find(({homework_id}) => hwID === homework_id);
+        if (!hw) {
+            slaveBotLogger.warn({hwID}, 'Получение задач: дз не найдено');
+            return context.send('ДЗ не найдено');
+        }
+
+        const {title, description, tasks} = hw;
+
+        await context.send({
+            message: `Домашнее задание: ${title || 'Без заголовка'}
+                Описание:\n${description || 'Без описания'}
+                Задачи: ${tasks.length ? '\n' : 'Без задач'}
+                `,
+        });
+
+        for (let [index, task] of tasks.entries()) {
+            const { description, attachmentURLs } = task;
+
+            // TODO error while upload is ignored
+            const attaches = await loadAttachments(peerId, this.vk, attachmentURLs);
+
+            await context.send({
+                message: `Задача №${index + 1}
+                Описание:\n${description || 'Без описания'}
+                `,
+                attachment: attaches,
+            });
+        }
+    }
+
+    private async getHomeworks(context: MessageContext): Promise<{ isError: boolean, homeworks: HomeworkPayload[] }> {
+        const { class_id } = context.state;
+
+        slaveBotLogger.debug({ class_id }, 'Обработка получения домашних заданий');
+        if (!class_id) {
+            slaveBotLogger.error('Получение дз: class_id === null');
+            return { isError: true, homeworks: [] };
+        }
 
         const { homeworks, ...getHomeworksError } = await this.backend.getClassHomeworks({
             class_id: class_id,
         });
 
         if (getHomeworksError.isError) {
-            slaveBotLogger.warn(getHomeworksError.error, 'Get homeworks error');
-            return context.send('Не получилось загрузить домашние задния :с');
+            slaveBotLogger.warn(getHomeworksError.error, 'Ошибка получения дз с бэка');
+            return { isError: true, homeworks: [] };
+        }
+
+        return { isError: false, homeworks: homeworks };
+    }
+
+    private async handleGetHomeworks(context: MessageContext<ContextDefaultState>) {
+
+        const { isError, homeworks } = await this.getHomeworks(context);
+
+        if (isError) {
+            return context.send('Не получилось загрузить домашние задния');
         }
 
         if (!homeworks.length) {
-            return context.send('Нет дз');
+            return context.send('Нет домашних заданий');
         }
 
-        const msg = 'Список дз:\n\n' + homeworks.map((hw, index) => {
-            return `
-            ${index}: ${hw.title}
-            ${hw.description}
-            `;
-        }).join('');
+        await context.send('Ваши домашние задания:');
 
-        return context.send(msg);
+        for (let [index, hw] of homeworks.entries()) {
+            const { tasks, title, description, homework_id } = hw
+            // TODO deadline
+            await context.send({
+                message: `${index + 1}: ${title || 'Без заголовка'}
+                Описание:\n${description || 'Без описания'}
+                Количество задач: ${tasks.length ? tasks.length : 'Без задач'}
+                `,
+                keyboard: HomeworkActionsKeyboard(homework_id).inline()
+            });
+        }
     }
 
     private async authMiddleware(context: MessageContext<ContextDefaultState>, next: NextMiddleware) {

@@ -5,5 +5,6 @@ export namespace CommandPatterns {
     export const Cancel = /^(\/){0,1}(cancel|отмена|отменить)/i;
     export const Start = /^(\/){0,1}(Начать|начать|start)/i;
     export const Help = /^(\/){0,1}(help|помощь|h|\?)/i;
-    export const Shedule = /^(\/){0,1}(расисание|занятия|shedule|\?)/i;
+    export const Shedule = /^(\/){0,1}(расисание|занятия|shedule)/i;
+    export const Tasks = /^(\/){0,1}(tasks)/i;
 }
