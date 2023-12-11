@@ -7,13 +7,12 @@ import VkBot from "../vk-bot/vk-bot";
 
 import { SceneManager } from "@vk-io/scenes";
 import { SessionManager } from "@vk-io/session";
+import { HomeworkPayload } from "../backend/models";
 import { loadAttachments, parseAttachments, uploadAttachments } from "../helpers/attachmentsHelper";
 import { CommandPatterns } from "./Commands/command-patterns";
+import { HomeworkActionsKeyboard } from "./Keyboards/homework-item-keyboard";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
 import { SendSolutionScene } from "./Scenes/send-solution-scene";
-import { SheduleEventKeyboard } from "./Keyboards/shedule-event-keyboard";
-import { HomeworkActionsKeyboard } from "./Keyboards/homework-item-keyboard";
-import { HomeworkPayload } from "../backend/models";
 
 const slaveBotLogger = logger.child({}, {
     msgPrefix: 'SlaveVkBot: '
@@ -132,35 +131,27 @@ export default class VkSlaveBot extends VkBot {
         await context.send('Ваше расписание:');
 
         events.forEach(async (event, index) => {
-            const stastISOms = Date.parse(event.startDateISO);
-            const endISOms = Date.parse(event.endDateISO);
-
-            const durationTotalMin = (endISOms - stastISOms) / (1000 * 60);
-            const durationH = Math.floor(durationTotalMin / 60);
-            const durationM = durationTotalMin % 60;
+            const durationDate = new Date(Math.abs(Date.parse(event.endDateISO) - Date.parse(event.startDateISO)));
             const duration =
-                (durationH < 10 ? '0' : '')
+                (durationDate.getHours() < 10 ? '0' : '')
                 +
-                durationH
+                durationDate.getHours()
                 +
                 ':'
                 +
-                (durationM < 10 ? '0' : '')
+                (durationDate.getMinutes() < 10 ? '0' : '')
                 +
-                durationM
+                durationDate.getMinutes()
                 ;
 
-            const offsetMin = new Date(stastISOms).getTimezoneOffset();
-
-            const start = new Date(stastISOms + (offsetMin + 3 * 60 /*MSK +3 h*/) * 60 * 1000).toLocaleString('ru-RU').slice(0, -3).replace(',', ' в');
+            const start = new Date(event.startDateISO).toLocaleString('ru-RU', { timeZone: "Europe/Moscow" }).slice(0, -3).replace(',', ' в');
             await context.send({
-                message: `${index + 1}: ${event.title || 'Без заголовка'}
-Начало: ${start} по МСК
-Продолжительность: ${duration}
-Описание:\n${event.description || 'Без описания'}
-                `,
-                // keyboard: SheduleEventKeyboard(event).inline(),
-            })
+                message: `${index + 1}: ${event.title || 'Без заголовка'}\n` +
+                    `Начало: ${start} по МСК\n` +
+                    `Продолжительность: ${duration}\n` +
+                    `Описание:\n${event.description || 'Без описания'}`,
+            });
+
         });
 
         return;
@@ -186,13 +177,13 @@ export default class VkSlaveBot extends VkBot {
         }
 
 
-        const hw = homeworks.find(({homework_id}) => hwID === homework_id);
+        const hw = homeworks.find(({ homework_id }) => hwID === homework_id);
         if (!hw) {
-            slaveBotLogger.warn({hwID}, 'Получение задач: дз не найдено');
+            slaveBotLogger.warn({ hwID }, 'Получение задач: дз не найдено');
             return context.send('ДЗ не найдено');
         }
 
-        const {title, description, tasks} = hw;
+        const { title, description, tasks } = hw;
 
         await context.send({
             message: `Домашнее задание: ${title || 'Без заголовка'}
@@ -216,7 +207,7 @@ export default class VkSlaveBot extends VkBot {
         }
     }
 
-    private async getHomeworks(context: MessageContext): Promise<{ isError: boolean, homeworks: HomeworkPayload[] }> {
+    private async getHomeworks(context: MessageContext): Promise<{ isError: boolean, homeworks: HomeworkPayload[]; }> {
         const { class_id } = context.state;
 
         slaveBotLogger.debug({ class_id }, 'Обработка получения домашних заданий');
@@ -252,7 +243,7 @@ export default class VkSlaveBot extends VkBot {
         await context.send('Ваши домашние задания:');
 
         for (let [index, hw] of homeworks.entries()) {
-            const { tasks, title, description, homework_id } = hw
+            const { tasks, title, description, homework_id } = hw;
             // TODO deadline
             await context.send({
                 message: `${index + 1}: ${title || 'Без заголовка'}
@@ -303,6 +294,17 @@ export default class VkSlaveBot extends VkBot {
                 slaveBotLogger.debug({ peerId, group_id }, 'Error update chat id');
                 return context.send('Не удалось создать чат. Повторите попытку позднее');
             }
+
+            const isOk = await this.backend.resendMessageFromClient({
+                internal_chat_id: internal_chat_id,
+                text: 'Ученик присоединился к классу!',
+                attachmentURLs: [],
+            });
+
+            if (!isOk) {
+                slaveBotLogger.error('Sending first msg to backend failed');
+            }
+
             chatData.internal_chat_id = internal_chat_id;
         }
 
@@ -318,6 +320,9 @@ export default class VkSlaveBot extends VkBot {
             return next();
         }
 
+        if (context.isCropped) {
+            await context.loadMessagePayload({ force: true });
+        }
         const { peerId, $groupId, text, attachments } = context;
 
         const internal_chat_id: number = context.state.internal_chat_id;
