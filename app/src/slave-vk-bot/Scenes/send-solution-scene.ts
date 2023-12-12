@@ -87,10 +87,10 @@ export namespace SendSolutionScene {
                         return context.send('Отправьте решение');
                     }
 
-                    const  homework_id  = context.scene.state.homework_id;
-                    const stundent_id  = context.state.student_id;
+                    const homework_id = context.scene.state.homework_id;
+                    const stundent_id = context.state.student_id;
                     if (!homework_id || !stundent_id) {
-                        sceneLogger.warn({homework_id, stundent_id} , 'Неверный контекст');
+                        sceneLogger.warn({ homework_id, stundent_id }, 'Неверный контекст');
                         await context.send('Что-то пошло не так');
                         return context.scene.leave();
                     }

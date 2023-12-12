@@ -20,6 +20,8 @@ export type HomeworkPayload = {
     homework_id: number;
     title: string;
     description: string;
+    createDateISO: string;
+    deadlineDateISO: string;
     tasks: TaskPayload[];
 };
 
@@ -34,7 +36,7 @@ export type EventPayload = {
     description: string;
     startDateISO: string;
     endDateISO: string;
-}
+};
 
 // Requests
 export type ValidateTokenPayload = {
@@ -71,7 +73,7 @@ export type FileUploadPayload = {
 
 export type GetEventsPayload = {
     classID: number;
-}
+};
 
 // Responses
 

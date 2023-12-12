@@ -28,7 +28,7 @@ class BackendMock implements Backend {
                     startDateISO: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
                     endDateISO: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
                 }]
-            })
+            });
         });
     }
 
@@ -188,6 +188,8 @@ class BackendMock implements Backend {
                         homework_id: Number(row.id),
                         title: String(row.title),
                         description: String(row.descr),
+                        createDateISO: '',
+                        deadlineDateISO: '',
                         tasks: [
                             {
                                 description: 'Супер пупер задача 1',

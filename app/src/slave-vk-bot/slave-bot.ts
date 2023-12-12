@@ -9,6 +9,7 @@ import { SceneManager } from "@vk-io/scenes";
 import { SessionManager } from "@vk-io/session";
 import { HomeworkPayload } from "../backend/models";
 import { loadAttachments, parseAttachments, uploadAttachments } from "../helpers/attachmentsHelper";
+import { dateToString } from "../helpers/date";
 import { CommandPatterns } from "./Commands/command-patterns";
 import { HomeworkActionsKeyboard } from "./Keyboards/homework-item-keyboard";
 import { MainKeyboard } from "./Keyboards/main-keyboard";
@@ -144,10 +145,10 @@ export default class VkSlaveBot extends VkBot {
                 durationDate.getMinutes()
                 ;
 
-            const start = new Date(event.startDateISO).toLocaleString('ru-RU', { timeZone: "Europe/Moscow" }).slice(0, -3).replace(',', ' в');
+            const start = dateToString(new Date(event.startDateISO));
             await context.send({
                 message: `${index + 1}: ${event.title || 'Без заголовка'}\n` +
-                    `Начало: ${start} по МСК\n` +
+                    `Начало: ${start}\n` +
                     `Продолжительность: ${duration}\n` +
                     `Описание:\n${event.description || 'Без описания'}`,
             });
@@ -183,10 +184,12 @@ export default class VkSlaveBot extends VkBot {
             return context.send('ДЗ не найдено');
         }
 
-        const { title, description, tasks } = hw;
+        const { title, description, tasks, createDateISO, deadlineDateISO } = hw;
 
         await context.send({
             message: `Домашнее задание: ${title || 'Без заголовка'}
+                Дата выдачи: ${dateToString(new Date(createDateISO))}
+                Срок выполнения: ${dateToString(new Date(deadlineDateISO))}
                 Описание:\n${description || 'Без описания'}
                 Задачи: ${tasks.length ? '\n' : 'Без задач'}
                 `,
@@ -243,10 +246,10 @@ export default class VkSlaveBot extends VkBot {
         await context.send('Ваши домашние задания:');
 
         for (let [index, hw] of homeworks.entries()) {
-            const { tasks, title, description, homework_id } = hw;
-            // TODO deadline
+            const { tasks, title, description, homework_id, deadlineDateISO } = hw;
             await context.send({
                 message: `${index + 1}: ${title || 'Без заголовка'}
+                Срок выполнения: ${dateToString(new Date(deadlineDateISO))}
                 Описание:\n${description || 'Без описания'}
                 Количество задач: ${tasks.length ? tasks.length : 'Без задач'}
                 `,

@@ -5,7 +5,7 @@ import logger from "../../helpers/logger";
 import { BotChatClient } from "./model_grpc_pb";
 //const grpc = require('@grpc/grpc-js');
 import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetEventsPayload, GetEventsResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, TaskPayload, ValidateTokenPayload, ValidateTokenResult } from "../models";
-import { CreateChatRequest, CreateStudentRequest, EventData, FileUploadRequest, Message as GRPCMessage, GetEventsRequest, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
+import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as GRPCMessage, GetEventsRequest, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
 
 import { gracefulStop } from "../../helpers/graceful-stop";
 import client from "./config";
@@ -126,7 +126,7 @@ export default class GRPCBackend implements Backend {
                             task => {
                                 return {
                                     description: task.getDescription(),
-                                    attachmentURLs: task.getAttachmenturlsList()
+                                    attachmentURLs: task.getAttachmenturlsList(),
                                 };
                             }
                         );
@@ -134,6 +134,8 @@ export default class GRPCBackend implements Backend {
                             homework_id: hw.getHomeworkid(),
                             title: hw.getTitle(),
                             description: hw.getDescription(),
+                            createDateISO: hw.getCreatedate(),
+                            deadlineDateISO: hw.getDeadlinedate(),
                             tasks
                         };
                     });

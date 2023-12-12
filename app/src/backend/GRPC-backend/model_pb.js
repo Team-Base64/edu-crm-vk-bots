@@ -847,7 +847,7 @@ proto.chat.TaskData.prototype.clearAttachmenturlsList = function() {
  * @private {!Array<number>}
  * @const
  */
-proto.chat.HomeworkData.repeatedFields_ = [4];
+proto.chat.HomeworkData.repeatedFields_ = [6];
 
 
 
@@ -883,6 +883,8 @@ proto.chat.HomeworkData.toObject = function(includeInstance, msg) {
     homeworkid: jspb.Message.getFieldWithDefault(msg, 1, 0),
     title: jspb.Message.getFieldWithDefault(msg, 2, ""),
     description: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    createdate: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    deadlinedate: jspb.Message.getFieldWithDefault(msg, 5, ""),
     tasksList: jspb.Message.toObjectList(msg.getTasksList(),
     proto.chat.TaskData.toObject, includeInstance)
   };
@@ -934,6 +936,14 @@ proto.chat.HomeworkData.deserializeBinaryFromReader = function(msg, reader) {
       msg.setDescription(value);
       break;
     case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setCreatedate(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDeadlinedate(value);
+      break;
+    case 6:
       var value = new proto.chat.TaskData;
       reader.readMessage(value,proto.chat.TaskData.deserializeBinaryFromReader);
       msg.addTasks(value);
@@ -988,10 +998,24 @@ proto.chat.HomeworkData.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getCreatedate();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+  f = message.getDeadlinedate();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
   f = message.getTasksList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      4,
+      6,
       f,
       proto.chat.TaskData.serializeBinaryToWriter
     );
@@ -1054,12 +1078,48 @@ proto.chat.HomeworkData.prototype.setDescription = function(value) {
 
 
 /**
- * repeated TaskData tasks = 4;
+ * optional string createDate = 4;
+ * @return {string}
+ */
+proto.chat.HomeworkData.prototype.getCreatedate = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.chat.HomeworkData} returns this
+ */
+proto.chat.HomeworkData.prototype.setCreatedate = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string deadlineDate = 5;
+ * @return {string}
+ */
+proto.chat.HomeworkData.prototype.getDeadlinedate = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.chat.HomeworkData} returns this
+ */
+proto.chat.HomeworkData.prototype.setDeadlinedate = function(value) {
+  return jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * repeated TaskData tasks = 6;
  * @return {!Array<!proto.chat.TaskData>}
  */
 proto.chat.HomeworkData.prototype.getTasksList = function() {
   return /** @type{!Array<!proto.chat.TaskData>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.chat.TaskData, 4));
+    jspb.Message.getRepeatedWrapperField(this, proto.chat.TaskData, 6));
 };
 
 
@@ -1068,7 +1128,7 @@ proto.chat.HomeworkData.prototype.getTasksList = function() {
  * @return {!proto.chat.HomeworkData} returns this
 */
 proto.chat.HomeworkData.prototype.setTasksList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 4, value);
+  return jspb.Message.setRepeatedWrapperField(this, 6, value);
 };
 
 
@@ -1078,7 +1138,7 @@ proto.chat.HomeworkData.prototype.setTasksList = function(value) {
  * @return {!proto.chat.TaskData}
  */
 proto.chat.HomeworkData.prototype.addTasks = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.chat.TaskData, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 6, opt_value, proto.chat.TaskData, opt_index);
 };
 
 

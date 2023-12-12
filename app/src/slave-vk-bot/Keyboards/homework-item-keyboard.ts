@@ -1,5 +1,4 @@
 import { Keyboard } from "vk-io";
-import { HomeworkPayload } from "../../backend/models";
 
 export const HomeworkActionsKeyboard = (homework_id: number | string) => {
     return Keyboard
@@ -20,4 +19,4 @@ export const HomeworkActionsKeyboard = (homework_id: number | string) => {
                 homework_id: homework_id,
             },
         });
-}
+};

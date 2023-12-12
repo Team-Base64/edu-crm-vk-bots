@@ -66,6 +66,10 @@ export class HomeworkData extends jspb.Message {
     setTitle(value: string): HomeworkData;
     getDescription(): string;
     setDescription(value: string): HomeworkData;
+    getCreatedate(): string;
+    setCreatedate(value: string): HomeworkData;
+    getDeadlinedate(): string;
+    setDeadlinedate(value: string): HomeworkData;
     clearTasksList(): void;
     getTasksList(): Array<TaskData>;
     setTasksList(value: Array<TaskData>): HomeworkData;
@@ -86,6 +90,8 @@ export namespace HomeworkData {
         homeworkid: number,
         title: string,
         description: string,
+        createdate: string,
+        deadlinedate: string,
         tasksList: Array<TaskData.AsObject>,
     }
 }
