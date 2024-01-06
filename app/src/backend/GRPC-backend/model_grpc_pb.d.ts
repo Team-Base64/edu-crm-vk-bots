@@ -72,14 +72,14 @@ interface IBotChatService_ICreateStudent extends grpc.MethodDefinition<model_pb.
     responseSerialize: grpc.serialize<model_pb.CreateStudentResponse>;
     responseDeserialize: grpc.deserialize<model_pb.CreateStudentResponse>;
 }
-interface IBotChatService_ISendSolution extends grpc.MethodDefinition<model_pb.SendSolutionRequest, model_pb.SendSolutionResponse> {
+interface IBotChatService_ISendSolution extends grpc.MethodDefinition<model_pb.SendSolutionRequest, model_pb.Nothing> {
     path: "/chat.BotChat/SendSolution";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<model_pb.SendSolutionRequest>;
     requestDeserialize: grpc.deserialize<model_pb.SendSolutionRequest>;
-    responseSerialize: grpc.serialize<model_pb.SendSolutionResponse>;
-    responseDeserialize: grpc.deserialize<model_pb.SendSolutionResponse>;
+    responseSerialize: grpc.serialize<model_pb.Nothing>;
+    responseDeserialize: grpc.deserialize<model_pb.Nothing>;
 }
 interface IBotChatService_IGetEvents extends grpc.MethodDefinition<model_pb.GetEventsRequest, model_pb.GetEventsResponse> {
     path: "/chat.BotChat/GetEvents";
@@ -100,7 +100,7 @@ export interface IBotChatServer extends grpc.UntypedServiceImplementation {
     getHomeworks: grpc.handleUnaryCall<model_pb.GetHomeworksRequest, model_pb.GetHomeworksResponse>;
     uploadFile: grpc.handleUnaryCall<model_pb.FileUploadRequest, model_pb.FileUploadResponse>;
     createStudent: grpc.handleUnaryCall<model_pb.CreateStudentRequest, model_pb.CreateStudentResponse>;
-    sendSolution: grpc.handleUnaryCall<model_pb.SendSolutionRequest, model_pb.SendSolutionResponse>;
+    sendSolution: grpc.handleUnaryCall<model_pb.SendSolutionRequest, model_pb.Nothing>;
     getEvents: grpc.handleUnaryCall<model_pb.GetEventsRequest, model_pb.GetEventsResponse>;
 }
 
@@ -123,9 +123,9 @@ export interface IBotChatClient {
     createStudent(request: model_pb.CreateStudentRequest, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
     createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
     createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
-    sendSolution(request: model_pb.SendSolutionRequest, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
-    sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
-    sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
+    sendSolution(request: model_pb.SendSolutionRequest, callback: (error: grpc.ServiceError | null, response: model_pb.Nothing) => void): grpc.ClientUnaryCall;
+    sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.Nothing) => void): grpc.ClientUnaryCall;
+    sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.Nothing) => void): grpc.ClientUnaryCall;
     getEvents(request: model_pb.GetEventsRequest, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
     getEvents(request: model_pb.GetEventsRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
     getEvents(request: model_pb.GetEventsRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
@@ -150,9 +150,9 @@ export class BotChatClient extends grpc.Client implements IBotChatClient {
     public createStudent(request: model_pb.CreateStudentRequest, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
     public createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
     public createStudent(request: model_pb.CreateStudentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.CreateStudentResponse) => void): grpc.ClientUnaryCall;
-    public sendSolution(request: model_pb.SendSolutionRequest, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
-    public sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
-    public sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.SendSolutionResponse) => void): grpc.ClientUnaryCall;
+    public sendSolution(request: model_pb.SendSolutionRequest, callback: (error: grpc.ServiceError | null, response: model_pb.Nothing) => void): grpc.ClientUnaryCall;
+    public sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.Nothing) => void): grpc.ClientUnaryCall;
+    public sendSolution(request: model_pb.SendSolutionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.Nothing) => void): grpc.ClientUnaryCall;
     public getEvents(request: model_pb.GetEventsRequest, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
     public getEvents(request: model_pb.GetEventsRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;
     public getEvents(request: model_pb.GetEventsRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: model_pb.GetEventsResponse) => void): grpc.ClientUnaryCall;

@@ -125,6 +125,17 @@ function deserialize_chat_Message(buffer_arg) {
   return model_pb.Message.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_chat_Nothing(arg) {
+  if (!(arg instanceof model_pb.Nothing)) {
+    throw new Error('Expected argument of type chat.Nothing');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_chat_Nothing(buffer_arg) {
+  return model_pb.Nothing.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_chat_SendSolutionRequest(arg) {
   if (!(arg instanceof model_pb.SendSolutionRequest)) {
     throw new Error('Expected argument of type chat.SendSolutionRequest');
@@ -134,17 +145,6 @@ function serialize_chat_SendSolutionRequest(arg) {
 
 function deserialize_chat_SendSolutionRequest(buffer_arg) {
   return model_pb.SendSolutionRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_chat_SendSolutionResponse(arg) {
-  if (!(arg instanceof model_pb.SendSolutionResponse)) {
-    throw new Error('Expected argument of type chat.SendSolutionResponse');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_chat_SendSolutionResponse(buffer_arg) {
-  return model_pb.SendSolutionResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_chat_ValidateTokenRequest(arg) {
@@ -242,11 +242,11 @@ var BotChatService = exports.BotChatService = {
     requestStream: false,
     responseStream: false,
     requestType: model_pb.SendSolutionRequest,
-    responseType: model_pb.SendSolutionResponse,
+    responseType: model_pb.Nothing,
     requestSerialize: serialize_chat_SendSolutionRequest,
     requestDeserialize: deserialize_chat_SendSolutionRequest,
-    responseSerialize: serialize_chat_SendSolutionResponse,
-    responseDeserialize: deserialize_chat_SendSolutionResponse,
+    responseSerialize: serialize_chat_Nothing,
+    responseDeserialize: deserialize_chat_Nothing,
   },
   getEvents: {
     path: '/chat.BotChat/GetEvents',

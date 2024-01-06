@@ -132,6 +132,8 @@ export class EventData extends jspb.Message {
     setStartdate(value: string): EventData;
     getEnddate(): string;
     setEnddate(value: string): EventData;
+    getClassid(): number;
+    setClassid(value: number): EventData;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): EventData.AsObject;
@@ -150,6 +152,7 @@ export namespace EventData {
         description: string,
         startdate: string,
         enddate: string,
+        classid: number,
     }
 }
 
@@ -396,19 +399,19 @@ export namespace GetHomeworksResponse {
     }
 }
 
-export class SendSolutionResponse extends jspb.Message { 
+export class Nothing extends jspb.Message { 
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): SendSolutionResponse.AsObject;
-    static toObject(includeInstance: boolean, msg: SendSolutionResponse): SendSolutionResponse.AsObject;
+    toObject(includeInstance?: boolean): Nothing.AsObject;
+    static toObject(includeInstance: boolean, msg: Nothing): Nothing.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: SendSolutionResponse, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): SendSolutionResponse;
-    static deserializeBinaryFromReader(message: SendSolutionResponse, reader: jspb.BinaryReader): SendSolutionResponse;
+    static serializeBinaryToWriter(message: Nothing, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): Nothing;
+    static deserializeBinaryFromReader(message: Nothing, reader: jspb.BinaryReader): Nothing;
 }
 
-export namespace SendSolutionResponse {
+export namespace Nothing {
     export type AsObject = {
     }
 }
