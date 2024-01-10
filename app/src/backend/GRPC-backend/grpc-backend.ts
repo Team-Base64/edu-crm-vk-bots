@@ -2,7 +2,7 @@ import Backend from "../backend";
 // import grpcOptions from "./config";
 import grpc from "@grpc/grpc-js";
 import logger from "../../helpers/logger";
-import { BotChatClient } from "./model_grpc_pb";
+import { ChatClient } from "./model_grpc_pb";
 //const grpc = require('@grpc/grpc-js');
 import { CreateChatPayload, CreateChatResult, CreateStudentPayload, CreateStudentResult, FileUploadPayload, FileUploadResult, GetEventsPayload, GetEventsResult, GetHomeworksPayload, GetHomeworksResult, HomeworkPayload, MessagePayload, SendSolutionPayload, SendSolutionResult, ServerMessageToSlaveHandler, TaskPayload, ValidateTokenPayload, ValidateTokenResult } from "../models";
 import { CreateChatRequest, CreateStudentRequest, FileUploadRequest, Message as GRPCMessage, GetEventsRequest, GetHomeworksRequest, SendSolutionRequest, SolutionData, ValidateTokenRequest } from "./model_pb";
@@ -17,7 +17,7 @@ const backendLogger = logger.child({}, {
 });
 
 export default class GRPCBackend implements Backend {
-    private client: BotChatClient;
+    private client: ChatClient;
     private stream: grpc.ClientDuplexStream<GRPCMessage, GRPCMessage> | null;
     private toSlaveHandlers: ServerMessageToSlaveHandler[];
 

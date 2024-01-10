@@ -170,9 +170,9 @@ function deserialize_chat_ValidateTokenResponse(buffer_arg) {
 }
 
 
-var BotChatService = exports.BotChatService = {
+var ChatService = exports.ChatService = {
   startChatVK: {
-    path: '/chat.BotChat/StartChatVK',
+    path: '/chat.Chat/StartChatVK',
     requestStream: true,
     responseStream: true,
     requestType: model_pb.Message,
@@ -183,7 +183,7 @@ var BotChatService = exports.BotChatService = {
     responseDeserialize: deserialize_chat_Message,
   },
   validateToken: {
-    path: '/chat.BotChat/ValidateToken',
+    path: '/chat.Chat/ValidateToken',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.ValidateTokenRequest,
@@ -194,7 +194,7 @@ var BotChatService = exports.BotChatService = {
     responseDeserialize: deserialize_chat_ValidateTokenResponse,
   },
   createChat: {
-    path: '/chat.BotChat/CreateChat',
+    path: '/chat.Chat/CreateChat',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.CreateChatRequest,
@@ -205,7 +205,7 @@ var BotChatService = exports.BotChatService = {
     responseDeserialize: deserialize_chat_CreateChatResponse,
   },
   getHomeworks: {
-    path: '/chat.BotChat/GetHomeworks',
+    path: '/chat.Chat/GetHomeworks',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.GetHomeworksRequest,
@@ -216,7 +216,7 @@ var BotChatService = exports.BotChatService = {
     responseDeserialize: deserialize_chat_GetHomeworksResponse,
   },
   uploadFile: {
-    path: '/chat.BotChat/UploadFile',
+    path: '/chat.Chat/UploadFile',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.FileUploadRequest,
@@ -227,7 +227,7 @@ var BotChatService = exports.BotChatService = {
     responseDeserialize: deserialize_chat_FileUploadResponse,
   },
   createStudent: {
-    path: '/chat.BotChat/CreateStudent',
+    path: '/chat.Chat/CreateStudent',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.CreateStudentRequest,
@@ -238,7 +238,7 @@ var BotChatService = exports.BotChatService = {
     responseDeserialize: deserialize_chat_CreateStudentResponse,
   },
   sendSolution: {
-    path: '/chat.BotChat/SendSolution',
+    path: '/chat.Chat/SendSolution',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.SendSolutionRequest,
@@ -249,7 +249,7 @@ var BotChatService = exports.BotChatService = {
     responseDeserialize: deserialize_chat_Nothing,
   },
   getEvents: {
-    path: '/chat.BotChat/GetEvents',
+    path: '/chat.Chat/GetEvents',
     requestStream: false,
     responseStream: false,
     requestType: model_pb.GetEventsRequest,
@@ -261,4 +261,4 @@ var BotChatService = exports.BotChatService = {
   },
 };
 
-exports.BotChatClient = grpc.makeGenericClientConstructor(BotChatService);
+exports.ChatClient = grpc.makeGenericClientConstructor(ChatService);

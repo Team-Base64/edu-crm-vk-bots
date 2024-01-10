@@ -102,7 +102,7 @@ message GetEventsResponse {
     repeated EventData events = 1;
 }
 
-service BotChat {
+service Chat {
     rpc StartChatVK(stream Message) returns (stream Message);
 
     rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
