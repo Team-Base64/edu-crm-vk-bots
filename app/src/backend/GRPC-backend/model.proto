@@ -36,6 +36,7 @@ message EventData {
     string description = 3;
     string startDate = 4;
     string endDate = 5;
+    int32 classID = 6;
 }
 
 // Requests
@@ -91,9 +92,7 @@ message GetHomeworksResponse {
     repeated HomeworkData homeworks = 1;
 }
 
-message SendSolutionResponse {
-
-}
+message Nothing {}
 
 message FileUploadResponse {
     string internalFileURL = 1;
@@ -103,7 +102,7 @@ message GetEventsResponse {
     repeated EventData events = 1;
 }
 
-service BotChat {
+service Chat {
     rpc StartChatVK(stream Message) returns (stream Message);
 
     rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
@@ -111,19 +110,6 @@ service BotChat {
     rpc GetHomeworks (GetHomeworksRequest) returns (GetHomeworksResponse);
     rpc UploadFile (FileUploadRequest) returns (FileUploadResponse);
     rpc CreateStudent(CreateStudentRequest) returns (CreateStudentResponse);
-    rpc SendSolution (SendSolutionRequest) returns (SendSolutionResponse);
+    rpc SendSolution (SendSolutionRequest) returns (Nothing);
     rpc GetEvents (GetEventsRequest) returns (GetEventsResponse);
 }
-
-
-// ПОТОМ
-
-    // ПОтом
-    // rpc startNotification() returns (stream Event);
-// message Event {
-//     oneof payload {
-//         Message message = 1;
-//         HomeworkData new_homework = 1;
-//         // В будущем уведомления
-//     }
-// }
